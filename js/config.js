@@ -19,10 +19,13 @@ export const DEFAULT_CONFIG = {
   minStartAge: 12,
   maxStartAge: 16,
   endAge: 25,
-  startMoney: 150, // Startgeld mit 12, pro Jahr älter kommt startMoneyPerYear dazu
-  startMoneyPerYear: 150,
+  startMoney: 40, // Startgeld mit 12, pro Jahr älter kommt startMoneyPerYear dazu
+  startMoneyPerYear: 60,
+  // Preisniveau: Aktivitäten bringen und kosten mit 12 nur einen Bruchteil, später ein Mehrfaches
+  // (Faktor auf den Betrag in der Liste, dazwischen gemittelt). Kurse und Erwachsenen-Jobs haben feste Beträge.
+  priceLevel: { 12: 0.25, 14: 0.45, 16: 0.75, 18: 1.1, 20: 1.5, 22: 1.9, 25: 2.5 },
   // Geld-Wert 100 entspricht diesem Polster (Konto + Sparkonto), je nach Alter. Dazwischen wird gemittelt.
-  moneyTargets: { 12: 400, 14: 700, 16: 1500, 18: 4000, 20: 12000, 22: 25000, 25: 60000 },
+  moneyTargets: { 12: 500, 14: 900, 16: 1800, 18: 5000, 20: 13000, 22: 24000, 25: 45000 },
   interestPercent: 1, // Spiel-Zins pro Quartal auf dem Sparkonto
   debtInterestPercent: 3, // Schuldzins pro Quartal, wenn das Konto im Minus ist
   lowEnergyLimit: 20, // darunter wirken positive Effekte nur halb
@@ -41,19 +44,19 @@ export const DEFAULT_CONFIG = {
   // Lebensphasen: Hauptbeschäftigung mit Einkommen, Grundkosten und Wirkung pro Quartal.
   // income: Betrag pro Quartal, als Liste = pro Jahr in dieser Phase (z.B. Lehrjahre). incomeByAge: Betrag ab Alter
   phases: [
-    { id: "schule", name: "Oberstufe", icon: "🏫", incomeLabel: "Taschengeld", incomeByAge: { 12: 120, 15: 225 }, costLabel: "", cost: 0,
+    { id: "schule", name: "Oberstufe", icon: "🏫", incomeLabel: "Taschengeld", incomeByAge: { 12: 120, 15: 225 }, costLabel: "Znüni, Kleinkram, Ausgang", cost: 60,
       drift: { energie: -11, beziehungen: 2 } },
-    { id: "mittelschule", name: "Gymnasium", icon: "📐", incomeLabel: "Taschengeld", income: [225], costLabel: "Schulmaterial und Ausflüge", cost: 90,
+    { id: "mittelschule", name: "Gymnasium", icon: "📐", incomeLabel: "Taschengeld", income: [225], costLabel: "Schulmaterial, Ausflüge, Ausgang", cost: 140,
       drift: { energie: -11, beziehungen: 2, zufriedenheit: 1 } },
-    { id: "lehre", name: "Lehre", icon: "🛠️", incomeLabel: "Lehrlingslohn", income: [2340, 2790, 3330], costLabel: "Kostgeld, ÖV, Kleider", cost: 1500,
+    { id: "lehre", name: "Lehre", icon: "🛠️", incomeLabel: "Lehrlingslohn", income: [2340, 2790, 3330], costLabel: "Kostgeld, ÖV, Kleider, Freizeit", cost: 1900,
       drift: { energie: -13, wertstiftung: 3, zufriedenheit: 1 } },
     { id: "studium", name: "Studium", icon: "🏛️", incomeLabel: "Unterstützung der Eltern", income: [1500], costLabel: "Semestergebühr, ÖV, Bücher", cost: 1000,
       drift: { energie: -13, zufriedenheit: -1, beziehungen: 2 } },
-    { id: "arbeit", name: "Berufsleben", icon: "💼", incomeLabel: "Lohn (netto)", income: [12000], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit)", cost: 6000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
+    { id: "arbeit", name: "Berufsleben", icon: "💼", incomeLabel: "Lohn (netto)", income: [12000], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit, Ferien)", cost: 7000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
       drift: { energie: -13, wertstiftung: 3 } },
-    { id: "job", name: "Job ohne Abschluss", icon: "📦", incomeLabel: "Lohn (netto)", income: [10200], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit)", cost: 6000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
+    { id: "job", name: "Job ohne Abschluss", icon: "📦", incomeLabel: "Lohn (netto)", income: [10800], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit, Ferien)", cost: 7000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
       drift: { energie: -14, wertstiftung: 2, zufriedenheit: -1 } },
-    { id: "akademisch", name: "Beruf nach dem Studium", icon: "💼", incomeLabel: "Lohn (netto)", income: [15000], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit)", cost: 6000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
+    { id: "akademisch", name: "Beruf nach dem Studium", icon: "💼", incomeLabel: "Lohn (netto)", income: [15000], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit, Ferien)", cost: 7000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
       drift: { energie: -13, wertstiftung: 3 } }
   ],
   // Was sich mit dem Alter ändert, unabhängig von der Lebensphase
@@ -67,7 +70,7 @@ export const DEFAULT_CONFIG = {
   ],
   activities: [
     ...BASE_ACTIVITIES,
-    ...ADULT_ACTIVITIES
+    ...ADULT_ACTIVITIES.map(a => ({ ...a, fixedMoney: true }))
   ],
   events: [
     ...BASE_EVENTS,

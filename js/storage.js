@@ -156,6 +156,8 @@ export function sanitizeConfig(cfg) {
   const mt = c.moneyTargets && typeof c.moneyTargets === "object" ? c.moneyTargets : D.moneyTargets;
   c.moneyTargets = Object.fromEntries(Object.entries(mt).map(([a, v]) => [String(Math.round(n(a, 0, 100, 12))), n(v, 1, 10000000, 1000)]));
   if (!Object.keys(c.moneyTargets).length) c.moneyTargets = { ...D.moneyTargets };
+  const pl = c.priceLevel && typeof c.priceLevel === "object" ? c.priceLevel : D.priceLevel;
+  c.priceLevel = Object.fromEntries(Object.entries(pl || {}).map(([a, v]) => [String(Math.round(n(a, 0, 100, 12))), n(v, 0, 100, 1)]));
   c.interestPercent = n(c.interestPercent, 0, 100, D.interestPercent);
   c.debtInterestPercent = n(c.debtInterestPercent, 0, 100, D.debtInterestPercent);
   c.lowEnergyLimit = n(c.lowEnergyLimit, 0, 100, D.lowEnergyLimit);
@@ -196,7 +198,8 @@ export function sanitizeConfig(cfg) {
     when: (Array.isArray(a.when) ? a.when : []).map(w => str(w, 30)).filter(w => SLOT_IDS.includes(w)), effects: effects(a.effects),
     info: str(a.info), lockedInfo: str(a.lockedInfo),
     minAge: opt(a.minAge, 0, 100), maxAge: opt(a.maxAge, 0, 100), tier: opt(a.tier, 1, 3),
-    rarity: RARITIES.includes(a.rarity) ? a.rarity : undefined, phases: strList(a.phases), useSavings: a.useSavings ? true : undefined
+    rarity: RARITIES.includes(a.rarity) ? a.rarity : undefined, phases: strList(a.phases), useSavings: a.useSavings ? true : undefined,
+    fixedMoney: a.fixedMoney ? true : undefined
   }));
   c.events = (Array.isArray(c.events) ? c.events : []).map(e => prune({
     ...e, id: str(e.id, 40), icon: str(e.icon, 8), text: str(e.text, 300),

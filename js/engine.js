@@ -25,15 +25,35 @@ export function phaseOf(cfg, state) {
   return cfg.phases.find(p => p.id === state.phase) || cfg.phases[0];
 }
 
-// Geld-Wert 100 entspricht je nach Alter einem anderen Polster (linear zwischen den Stützwerten)
-export function moneyTarget(cfg, age) {
-  const pts = Object.entries(cfg.moneyTargets || { 12: 300 }).map(([a, v]) => [Number(a), Number(v)]).sort((a, b) => a[0] - b[0]);
+// Wert aus einer Tabelle Alter -> Zahl, linear zwischen den Stützwerten
+function interpolate(table, age) {
+  const pts = Object.entries(table).map(([a, v]) => [Number(a), Number(v)]).sort((a, b) => a[0] - b[0]);
   if (age <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) {
     const [a0, v0] = pts[i - 1], [a1, v1] = pts[i];
     if (age <= a1) return v0 + (v1 - v0) * (age - a0) / (a1 - a0);
   }
   return pts.at(-1)[1];
+}
+
+// Geld-Wert 100 entspricht je nach Alter einem anderen Polster
+export function moneyTarget(cfg, age) {
+  return interpolate(cfg.moneyTargets || { 12: 300 }, age);
+}
+
+// Preisniveau: Wie viel eine Aktivität in diesem Alter einbringt oder kostet (1 = Betrag in der Liste).
+// Mit 12 verdient und braucht man wenig, später viel mehr.
+export function priceLevel(cfg, age) {
+  return cfg.priceLevel && Object.keys(cfg.priceLevel).length ? interpolate(cfg.priceLevel, age) : 1;
+}
+
+// Geldbetrag einer Aktivität in einem bestimmten Alter. Kurse (einmalig) und feste Beträge bleiben gleich.
+export function actMoney(cfg, act, age) {
+  const m = act?.money || 0;
+  if (!m || act.fixedMoney || act.once) return m;
+  const v = m * priceLevel(cfg, age);
+  const step = Math.abs(v) < 100 ? 5 : 10;
+  return Math.round(v / step) * step || Math.sign(m) * 5;
 }
 
 export function moneyValue(cfg, state) {
@@ -298,10 +318,11 @@ export function activityStatus(cfg, state, act, slot) {
   if (act.once && state.history.some(h => h.acts.includes(act.id))) return { ok: false, reason: "Schon erledigt" };
   const planned = Object.entries(state.plan).filter(([s]) => s !== slot).map(([, id]) => id);
   if (planned.includes(act.id) && !act.core) return { ok: false, reason: "Dieses Quartal schon gewählt" };
-  if (act.money < 0) {
-    const spent = planned.map(id => cfg.activities.find(a => a.id === id)).reduce((s, a) => s + Math.min(0, a?.money || 0), 0);
+  const price = actMoney(cfg, act, age);
+  if (price < 0) {
+    const spent = planned.map(id => cfg.activities.find(a => a.id === id)).reduce((s, a) => s + Math.min(0, actMoney(cfg, a, age)), 0);
     const cash = state.konto + (act.useSavings ? state.spar : 0);
-    if (cash + spent + act.money < 0) return { ok: false, reason: act.useSavings ? "Zu wenig Geld auf Konto und Sparkonto" : "Zu wenig Geld auf dem Konto" };
+    if (cash + spent + price < 0) return { ok: false, reason: act.useSavings ? "Zu wenig Geld auf Konto und Sparkonto" : "Zu wenig Geld auf dem Konto" };
   }
   return { ok: true };
 }
@@ -393,9 +414,10 @@ function simulateDay(cfg, state) {
   for (const slot of SLOTS) {
     const act = cfg.activities.find(a => a.id === state.plan[slot]);
     if (!act) continue;
-    if (act.money) {
-      if (act.money < 0) pay(state, -act.money);
-      else { const m = round1(act.money * factor); state.konto = round1(state.konto + m); addIncome(state, m); }
+    const money = actMoney(cfg, act, ageAt(state));
+    if (money) {
+      if (money < 0) pay(state, -money);
+      else { const m = round1(money * factor); state.konto = round1(state.konto + m); addIncome(state, m); }
     }
     applyEffects(cfg, state, act.effects, factor);
   }

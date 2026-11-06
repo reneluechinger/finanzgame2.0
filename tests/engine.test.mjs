@@ -91,6 +91,21 @@ test("Lehrlingslohn steigt mit jedem Lehrjahr", () => {
   assert.equal(E.phaseIncome(cfg, st), 3330);
 });
 
+test("Geld-Progression: mit 12 wenig, mit 24 viel mehr (Einnahmen und Ausgaben)", () => {
+  const gassi = cfg.activities.find(a => a.id === "a_hunde_ausfuehren");
+  const shoppen = cfg.activities.find(a => a.id === "shoppen");
+  assert.ok(E.actMoney(cfg, gassi, 12) <= 50, "Gassi mit 12: " + E.actMoney(cfg, gassi, 12));
+  assert.ok(E.actMoney(cfg, gassi, 20) >= 3 * E.actMoney(cfg, gassi, 12));
+  assert.ok(E.actMoney(cfg, shoppen, 24) <= 5 * E.actMoney(cfg, shoppen, 12));
+  assert.ok(E.actMoney(cfg, shoppen, 24) < -250);
+  // Kurse und Erwachsenen-Jobs bleiben fest
+  assert.equal(E.actMoney(cfg, cfg.activities.find(a => a.id === "babysitterkurs"), 12), -120);
+  assert.equal(E.actMoney(cfg, cfg.activities.find(a => a.id === "j_service"), 22), 700);
+  // Mit 12 startet man mit wenig Geld und ist nicht sofort bei 100
+  const st = E.newGame(cfg, "t", "x", 12);
+  assert.ok(E.moneyValue(cfg, st) < 50, "Geld-Wert beim Start " + E.moneyValue(cfg, st));
+});
+
 test("Energie-Kosten sind 20 % kleiner", () => {
   assert.equal(E.effectiveDelta(cfg, "energie", -10), -8);
   assert.equal(E.effectiveDelta(cfg, "energie", 10), 10);

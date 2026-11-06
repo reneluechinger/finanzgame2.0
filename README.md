@@ -16,6 +16,7 @@ Kernidee: Geld ist oft die Folge von Nutzen, den man für andere schafft. Wer nu
 - **Erwachsenen-Effekte:** Steuern ab 18 (einmal pro Jahr auf das Einkommen des Vorjahres), Krankenkasse ab 19 mit Wahl der Franchise (Entscheid mit 18), Kreditkarte (sicher mit 19), Leasing (sicher mit 21), Ratenkauf, Betreibung (sicher nach 2 Quartalen mit Schulden), Säule 3a, Krypto, freiwilliger Auszug in WG oder Wohnung ab 20
 - **Progression:** Aktivitäten sind nach Alter freigeschaltet. Gesperrte erscheinen als Vorschau («🔒 ab 16»). Jobs haben Stufen 1–3: zuerst einfache, später besser bezahlte. Im Jahresrückblick steht, was mit dem nächsten Geburtstag neu dazukommt. Ausruhen geht immer
 - **Seltenheit:** Manche Aktivitäten tauchen nur selten auf: selten (5 %), sehr selten (1 %), ultra-selten (0,1 %), jeweils pro Quartal. «Geld an Israel spenden» ist ultra-selten (bei 52 Quartalen in etwa jedem 20. Spiel), kostet Fr. 10 000 (auch vom Sparkonto) und gibt +20 auf alle anderen Werte
+- **Geld-Progression:** Mit 12 startet man mit Fr. 40, Jobs bringen wenig (z.B. Hunde ausführen etwa Fr. 40 pro Quartal) und Ausgaben kosten wenig. Ein Preisniveau nach Alter (Faktor 0,25 mit 12 bis 2,5 mit 25) lässt Einnahmen und Ausgaben der Aktivitäten mit dem Alter steigen. Dazu kommen grössere Fixkosten: Lebenskosten in der Lehre Fr. 1900 und im Berufsleben Fr. 7000 pro Quartal, Krankenkasse, Steuern, Miete. Kurse und Erwachsenen-Jobs haben feste Beträge
 - **Energie:** Alle Energie-Kosten sind 20 % kleiner (im Editor einstellbar)
 - **Playlist:** «Playlist zusammenstellen» schaltet «Eigene Playlist hören» frei (Energie ↑↑↑, +12)
 - **Nach jedem Jahr** statt nach jeder Woche ein Rückblick mit Reflexionsfrage und Speichern
@@ -30,9 +31,9 @@ Kernidee: Geld ist oft die Folge von Nutzen, den man für andere schafft. Wer nu
 5. Nach jedem Jahr: Rückblick mit Verlauf und Reflexionsfrage. Hier kann man speichern und später weiterspielen
 6. Mit 25: Lebensbilanz, druckbar oder als PDF speicherbar. Der Eintrag in die Bestenliste passiert automatisch
 
-**Punkte** = Durchschnitt aller Werte − halber Abstand zwischen höchstem und tiefstem Wert. Für jeden Wert auf 0 gibt es 5 Punkte Abzug. Der **Geld-Wert** misst das Polster (Konto + Sparkonto) im Verhältnis zum Alter: 100 entspricht mit 12 etwa Fr. 400, mit 18 Fr. 4000, mit 24 rund Fr. 48 000 (pro Quartal gemittelt, damit es am Geburtstag keinen Sprung gibt).
+**Punkte** = Durchschnitt aller Werte − halber Abstand zwischen höchstem und tiefstem Wert. Für jeden Wert auf 0 gibt es 5 Punkte Abzug. Der **Geld-Wert** misst das Polster (Konto + Sparkonto) im Verhältnis zum Alter: 100 entspricht mit 12 etwa Fr. 500, mit 16 Fr. 1800, mit 18 Fr. 5000, mit 24 rund Fr. 38 000 (pro Quartal gemittelt, damit es am Geburtstag keinen Sprung gibt).
 
-Testläufe (`node tests/sim.mjs`, je 30 Spiele, Start mit 12 bzw. 16): sehr ausgewogenes Spiel etwa 95 Punkte, Faustregel «Abend immer ausruhen, sonst zufällig» 87–90, einfache Strategie 80–89, zufällig 29–34, nur Arbeit oder nur Spass unter 25. Wer studiert, hat bis 22 deutlich weniger Geld; wer im Studium auszieht, verschuldet sich.
+Testläufe (`node tests/sim.mjs`, je 30 Spiele, Start mit 12 bzw. 16): sehr ausgewogenes Spiel etwa 94–95 Punkte, Faustregel «Abend immer ausruhen, sonst zufällig» 81–90, einfache Strategie 80–87, zufällig 28–33, nur Arbeit oder nur Spass unter 25. Wer studiert, hat bis 22 deutlich weniger Geld; wer im Studium auszieht, verschuldet sich.
 
 ## Beträge und Quellen (vereinfacht)
 
@@ -41,7 +42,7 @@ Testläufe (`node tests/sim.mjs`, je 30 Spiele, Start mit 12 bzw. 16): sehr ausg
 | Taschengeld | Fr. 40 pro Monat bis 14, Fr. 75 ab 15 | Budgetberatung Schweiz, Richtlinien Taschengeld 2023/2024 (Fr. 30–50 bzw. 50–100) |
 | Lehrlingslohn | Fr. 780 / 930 / 1110 pro Monat | lohncheck.ch, «Lehrling», Durchschnitt pro Lehrjahr (2026) |
 | Krankenkasse ab 19 | rund Fr. 326 pro Monat, mit Franchise 2500 Fr. 100 weniger | BAG, Prämien 2026, mittlere Prämie junge Erwachsene Fr. 326.30 |
-| Lohn nach Lehre / Studium, Lebenskosten, Steuersatz, Miete | Fr. 4000 / 5000 netto pro Monat, Fr. 2000 Lebenskosten, 8 % über Fr. 10 000 (Säule 3a im Jahr der Einzahlung abziehbar) | grobe Annahmen ohne Einzelquelle |
+| Lohn nach Lehre / Studium / Job, Lebenskosten, Steuersatz, Miete | Fr. 4000 / 5000 / 3600 netto pro Monat, rund Fr. 2300 Lebenskosten (Lehre Fr. 630), 8 % über Fr. 10 000 (Säule 3a im Jahr der Einzahlung abziehbar) | grobe Annahmen ohne Einzelquelle |
 
 ## Schritt 1: Spiel online stellen (GitHub Pages)
 

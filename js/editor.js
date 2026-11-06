@@ -74,6 +74,7 @@ function body() {
         ${num("lockedPreview", d.lockedPreview, "Gesperrte Vorschau pro Zeitfenster")}
       </div>
       ${listTxt("moneyTargets", d.moneyTargets, "Geld-Wert 100 entspricht (Alter:Franken, dazwischen gemittelt)", "agemap")}
+      ${listTxt("priceLevel", d.priceLevel, "Preisniveau der Aktivitäten (Alter:Faktor, z.B. 12:0.25 = ein Viertel des Betrags)", "agemap")}
       <h3>Steuern (vereinfacht)</h3>
       <div class="grid3">
         ${num("tax.fromAge", d.tax?.fromAge, "Ab Alter")}
@@ -144,7 +145,7 @@ function body() {
   if (tab === "akt") return `
     <section class="card">
       <h2>Aktivitäten (${d.activities.length})</h2>
-      <p class="small">Effekte: ungefähr 4 = ↑, 8 = ↑↑, 12 = ↑↑↑. Geld in Franken für das ganze Quartal, negative Zahl = kostet. Pro Zeitfenster sehen die Lernenden eine Auswahl (Einstellung unter «Allgemein»). Mit «Immer anbieten» ist eine Aktivität jedes Quartal dabei. Jobs mit Stufe 1–3 erscheinen passend zum Alter häufiger (Stufe 1 bis 14, Stufe 2 bis 17, Stufe 3 ab 18).</p>
+      <p class="small">Effekte: ungefähr 4 = ↑, 8 = ↑↑, 12 = ↑↑↑. Geld in Franken für das ganze Quartal, negative Zahl = kostet. Der Betrag wird mit dem Preisniveau des Alters multipliziert (unter «Allgemein»), ausser bei Kursen und festen Beträgen. Pro Zeitfenster sehen die Lernenden eine Auswahl (Einstellung unter «Allgemein»). Mit «Immer anbieten» ist eine Aktivität jedes Quartal dabei. Jobs mit Stufe 1–3 erscheinen passend zum Alter häufiger (Stufe 1 bis 14, Stufe 2 bis 17, Stufe 3 ab 18).</p>
       ${filterBox()}
       ${d.activities.map((a, i) => `
         <details ${openItem === "a" + i ? "open" : ""} data-open="a${i}">
@@ -157,7 +158,8 @@ function body() {
             <div class="grid3">${num(`activities.${i}.minAge`, a.minAge, "Ab Alter (0 = immer)")}${num(`activities.${i}.maxAge`, a.maxAge, "Bis Alter (0 = immer)")}
               ${sel(`activities.${i}.tier`, a.tier, "Job-Stufe", [["", "kein Job"], ["1", "Stufe 1"], ["2", "Stufe 2"], ["3", "Stufe 3"]])}
               ${sel(`activities.${i}.rarity`, a.rarity, "Seltenheit", RARITIES)}
-              ${chk(`activities.${i}.useSavings`, a.useSavings, "Darf Sparkonto brauchen")}</div>
+              ${chk(`activities.${i}.useSavings`, a.useSavings, "Darf Sparkonto brauchen")}
+              ${chk(`activities.${i}.fixedMoney`, a.fixedMoney, "Fester Betrag (ohne Preisniveau)")}</div>
             <p class="small">Nur in diesen Lebensphasen (keine Auswahl = immer):</p>${phaseChecks(`activities.${i}.phases`, a.phases)}
             ${txt(`activities.${i}.info`, a.info, "Hinweis für Lernende (optional)", "wide")}
             <details class="adv"><summary>Erweitert: Freischalten und Verzögerung</summary>

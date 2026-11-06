@@ -173,7 +173,8 @@ function arrow(d) {
 
 function effectText(a) {
   const parts = [];
-  if (a.money) parts.push(`<span class="${a.money > 0 ? "pos" : "neg"}">${a.money > 0 ? "+" : ""}${fr(a.money)}</span>`);
+  const m = E.actMoney(cfg, a, Math.max(E.ageAt(state), a.minAge || 0));
+  if (m) parts.push(`<span class="${m > 0 ? "pos" : "neg"}">${m > 0 ? "+" : ""}${fr(m)}</span>`);
   for (const v of cfg.values) {
     const raw = a.effects?.[v.id];
     if (!raw) continue;
@@ -413,6 +414,7 @@ function showHelp() {
       <ul>${cfg.values.map(v => `<li>${esc(v.icon)} <b>${esc(v.name)}</b>${v.money ? ` (Konto + Sparkonto. Wie viel für 100 nötig ist, wächst mit dem Alter: mit ${esc(cfg.minStartAge)} sind es ${fr(Math.round(E.moneyTarget(cfg, cfg.minStartAge)))}, mit ${esc(cfg.endAge - 1)} ${fr(Math.round(E.moneyTarget(cfg, cfg.endAge - 1)))})` : ""}</li>`).join("")}</ul>
       <p><b>Ein Spieltag ist ein Quartal</b> (3 Monate), vier Spieltage sind ein Jahr. Du wählst, was du in dieser Zeit regelmässig machst: am Nachmittag, am Abend und am Wochenende. Die gestrichelte Linie zeigt dir, wie sich deine Werte verändern.</p>
       <p><b>Älter werden:</b> Viele Aktivitäten sind am Anfang gesperrt (🔒 ab 16). Mit jedem Geburtstag kommen neue dazu, und die Jobs werden besser bezahlt. Ausruhen geht immer.</p>
+      <p><b>Geld wächst mit:</b> Mit 12 verdienst du mit einem Job nur wenig und gibst auch wenig aus. Je älter du wirst, desto mehr bringen Jobs ein, und desto mehr kostet alles. Fixkosten wie Krankenkasse, Miete und Lebenskosten kommen dazu.</p>
       <p><b>Lebensphasen:</b> Zuerst gehst du in die Oberstufe. Mit 16 wählst du Lehre oder Gymnasium, mit 18 nach dem Gymnasium Studium oder Arbeit. Jede Phase bringt Geld und kostet Energie.</p>
       <p><b>Erwachsen werden:</b> Ab ${esc(cfg.tax?.fromAge ?? 18)} zahlst du Steuern (die Rechnung kommt jeweils im Jahr danach), ab 19 die Krankenkasse selbst. Verträge wie Leasing, Kreditkarte oder Ratenkauf kosten oft mehr, als man denkt. Alle Beträge sind vereinfacht.</p>
       ${wert ? `<p><b>${esc(wert.name)}</b> bedeutet: Du schaffst Nutzen für andere. Manchmal wirst du dafür bezahlt, manchmal nicht.</p>` : ""}
