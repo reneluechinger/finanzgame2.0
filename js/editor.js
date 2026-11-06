@@ -1,6 +1,7 @@
 // Lehrpersonen-Editor: Variante anpassen und als Link teilen
 import * as S from "./storage.js";
 import { DEFAULT_CONFIG } from "./config.js";
+import { actMoney } from "./engine.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -45,6 +46,16 @@ const sel = (path, val, label, options) =>
   `<label class="f"><span>${label}</span><select data-p="${path}">${options.map(([v, n]) => `<option value="${esc(v)}" ${String(val ?? "") === v ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`;
 const chk = (path, val, label) =>
   `<label class="c"><input type="checkbox" data-p="${path}" data-t="bool" ${val ? "checked" : ""}> ${label}</label>`;
+
+// Zeigt, wie viel eine Aktivität im Spiel je nach Alter bringt oder kostet
+const fmt = n => (n < 0 ? "−" : "+") + "Fr. " + Math.abs(n).toLocaleString("de-CH").replace(/’/g, "'");
+function moneyHint(a) {
+  if (!a.money) return "Kein Geld.";
+  if (a.fixedMoney || a.once) return `Fester Betrag: im Spiel immer ${fmt(a.money)}${a.once ? " (einmaliger Kurs)" : ""}.`;
+  const from = Math.max(draft.minStartAge, a.minAge || 0), to = Math.min(draft.endAge - 1, a.maxAge || 99);
+  const ages = [...new Set([from, 14, 16, 18, 20, 22, to])].filter(x => x >= from && x <= to).sort((x, y) => x - y);
+  return "Im Spiel pro Quartal (Preisniveau): " + ages.map(g => `mit ${g} ${fmt(actMoney(draft, a, g))}`).join(" · ");
+}
 
 function effectInputs(base, effects, key = "effects") {
   return `<div class="effects">${draft.values.filter(v => !v.money).map(v =>
@@ -151,7 +162,8 @@ function body() {
         <details ${openItem === "a" + i ? "open" : ""} data-open="a${i}">
           <summary>${esc(a.icon)} ${esc(a.name)}</summary>
           ${openItem !== "a" + i ? "" : `<div class="item">
-            <div class="grid3">${txt(`activities.${i}.icon`, a.icon, "Symbol")}${txt(`activities.${i}.name`, a.name, "Name")}${num(`activities.${i}.money`, a.money, "Geld (Fr.)")}</div>
+            <div class="grid3">${txt(`activities.${i}.icon`, a.icon, "Symbol")}${txt(`activities.${i}.name`, a.name, "Name")}${num(`activities.${i}.money`, a.money, "Grundbetrag Geld (Fr.)")}</div>
+            <p class="small money-hint" id="mh-${i}">${moneyHint(a)}</p>
             ${effectInputs(`activities.${i}`, a.effects)}
             <p class="small">Wann möglich?</p>
             <div class="checks">${WHEN.map(([k, n]) => `<label class="c"><input type="checkbox" data-p="activities.${i}.when" data-t="when" data-k="${k}" ${a.when?.includes(k) ? "checked" : ""}> ${n}</label>`).join("")}</div>
@@ -360,6 +372,8 @@ function onInput(ev) {
   } else if (t === "bool") setPath(draft, p, el.checked || undefined);
   else if (t === "num") setPath(draft, p, el.value === "" ? 0 : Number(el.value));
   else setPath(draft, p, el.value);
+  const m = p.match(/^activities\.(\d+)\.(money|fixedMoney)$/);
+  if (m) { const h = root.querySelector(`#mh-${m[1]}`); if (h) h.textContent = moneyHint(draft.activities[m[1]]); }
   markDirty();
 }
 

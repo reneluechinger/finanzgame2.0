@@ -77,7 +77,7 @@ Unpassende Spitznamen löschst du direkt im Sheet (Zeile löschen).
 2. Anpassen:
    - **Werte**: umbenennen, Symbol und Farbe ändern, neue Werte hinzufügen oder entfernen. Der Geld-Wert bleibt immer.
    - **Lebensphasen**: Einkommen (pro Lehrjahr oder nach Alter), Grundkosten und Wirkung pro Quartal.
-   - **Aktivitäten**: Wirkung, Geld pro Quartal, Zeitfenster, Altersfenster (ab/bis), Job-Stufe, Seltenheit, Lebensphasen. «Immer anbieten» zeigt sie jedes Quartal. Unter «Erweitert» lassen sich Aktivitäten freischalten (Beispiel: Babysitter-Kurs schaltet ab nächstem Quartal Babysitten frei).
+   - **Aktivitäten**: Wirkung, Grundbetrag Geld pro Quartal (darunter steht, was daraus mit 12, 14, 16 … im Spiel wird), Zeitfenster, Altersfenster (ab/bis), Job-Stufe, Seltenheit, Lebensphasen. «Immer anbieten» zeigt sie jedes Quartal. Unter «Erweitert» lassen sich Aktivitäten freischalten (Beispiel: Babysitter-Kurs schaltet ab nächstem Quartal Babysitten frei).
    - **Ereignisse**: Text, bis zu drei Wahlmöglichkeiten, Altersfenster, Meilenstein mit Alter. Eine Wahl kann die Lebensphase wechseln, ein Merkmal setzen, den Lohn ändern oder laufende Kosten auslösen.
    - **Kosten & Fragen**: Kosten nach Alter (z.B. Krankenkasse ab 19), Reflexionsfragen pro Jahr und die Schlussfrage. Steuern unter «Allgemein».
 3. **Speichern**, dann **Teilen → Link erzeugen**. Jeder Variantenname hat eine eigene Bestenliste. Für eine weitere Klasse also einfach den Namen ändern (z.B. «Klasse 3sb») und speichern. Bleibt der Name gleich, bleiben Spielstände und Bestenliste erhalten, auch wenn du Aktivitäten änderst.
@@ -115,5 +115,5 @@ tests/              Tests der Spiellogik und Simulation zum Abstimmen
 
 Lokal starten: `python3 -m http.server` im Projektordner, dann `http://localhost:8000` öffnen (ES-Module laufen nicht über `file://`).
 
-Tests: `node --test tests/engine.test.mjs`
+Tests: `node --test tests/engine.test.mjs tests/storage.test.mjs`
 Abstimmung der Zahlen: `node tests/sim.mjs` spielt fünf Strategien je 30-mal durch (Start mit 12 und mit 16).

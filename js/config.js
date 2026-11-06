@@ -11,7 +11,7 @@ import { ADULT_ACTIVITIES, ADULT_EVENTS } from "./content_adult.js";
 export const DEFAULT_CONFIG = {
   name: "Standard",
   vid: "std",
-  contentVersion: 1,
+  contentVersion: 2, // bei neuer Abstimmung erhöhen: gespeicherte Varianten übernehmen die neuen Standardwerte
   offerCount: 8, // so viele Aktivitäten werden pro Zeitfenster angeboten (0 = alle)
   lockedPreview: 2, // so viele gesperrte Aktivitäten («ab 16») werden pro Zeitfenster gezeigt
   pinHash: "",

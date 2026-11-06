@@ -224,10 +224,21 @@ export function sanitizeConfig(cfg) {
   return migrateContent(c);
 }
 
-// Neue Standard-Inhalte in ältere Varianten übernehmen (bestehende Einträge bleiben, wie sie sind)
+// Gespeicherte Varianten auf den neuen Stand bringen.
+// Ab Version 2 (Geld-Progression): Geld- und Balance-Einstellungen sowie die Standard-Aktivitäten und
+// -Ereignisse werden durch die neue Abstimmung ersetzt. Eigene Aktivitäten und Ereignisse bleiben.
+const BALANCE_KEYS = ["startMoney", "startMoneyPerYear", "priceLevel", "moneyTargets", "phases", "costs", "drift",
+  "softCap", "energyCostFactor", "tax", "ageDrift", "interestPercent", "debtInterestPercent"];
 function migrateContent(c) {
   const target = DEFAULT_CONFIG.contentVersion;
   if ((c.contentVersion || 1) >= target) return c;
+  if ((c.contentVersion || 1) < 2) {
+    for (const k of BALANCE_KEYS) c[k] = structuredClone(DEFAULT_CONFIG[k]);
+    for (const key of ["activities", "events"]) {
+      const defs = new Map(DEFAULT_CONFIG[key].map(x => [x.id, x]));
+      c[key] = c[key].map(x => (defs.has(x.id) ? structuredClone(defs.get(x.id)) : x));
+    }
+  }
   for (const key of ["activities", "events"]) {
     const have = new Set(c[key].map(x => x.id));
     for (const d of DEFAULT_CONFIG[key]) {
