@@ -22,13 +22,13 @@ export const DEFAULT_CONFIG = {
   startMoney: 150, // Startgeld mit 12, pro Jahr älter kommt startMoneyPerYear dazu
   startMoneyPerYear: 150,
   // Geld-Wert 100 entspricht diesem Polster (Konto + Sparkonto), je nach Alter. Dazwischen wird gemittelt.
-  moneyTargets: { 12: 400, 14: 700, 16: 1500, 18: 4000, 20: 10000, 22: 20000, 25: 45000 },
+  moneyTargets: { 12: 400, 14: 700, 16: 1500, 18: 4000, 20: 12000, 22: 25000, 25: 60000 },
   interestPercent: 1, // Spiel-Zins pro Quartal auf dem Sparkonto
   debtInterestPercent: 3, // Schuldzins pro Quartal, wenn das Konto im Minus ist
   lowEnergyLimit: 20, // darunter wirken positive Effekte nur halb
   energyCostFactor: 0.8, // negative Energie-Effekte werden damit multipliziert (0.8 = 20 % weniger)
-  softCap: 92, // ab diesem Wert steigen Werte langsamer
-  tax: { fromAge: 18, freeAmount: 10000, rate: 8, saeule3aDeduction: 7000 }, // vereinfacht: (Jahreseinkommen − Freibetrag) × Satz %
+  softCap: 85, // ab diesem Wert steigen Werte langsamer
+  tax: { fromAge: 18, freeAmount: 10000, rate: 8 }, // vereinfacht: (Jahreseinkommen − Freibetrag − Säule 3a) × Satz %
   values: [
     { id: "geld", name: "Geld", icon: "💰", color: "#2e9d5b", money: true },
     { id: "zufriedenheit", name: "Zufriedenheit", icon: "😊", color: "#e6a118", start: 50 },
@@ -37,7 +37,7 @@ export const DEFAULT_CONFIG = {
     { id: "beziehungen", name: "Beziehungen", icon: "❤️", color: "#2aa3c4", start: 50 }
   ],
   // Was jedes Quartal ohnehin passiert (zusätzlich zur Wirkung der Lebensphase)
-  drift: { everyDay: { zufriedenheit: -2, wertstiftung: -2, beziehungen: -2, energie: 8 } },
+  drift: { everyDay: { zufriedenheit: -3, wertstiftung: -3, beziehungen: -3, energie: 8 } },
   // Lebensphasen: Hauptbeschäftigung mit Einkommen, Grundkosten und Wirkung pro Quartal.
   // income: Betrag pro Quartal, als Liste = pro Jahr in dieser Phase (z.B. Lehrjahre). incomeByAge: Betrag ab Alter
   phases: [
@@ -48,7 +48,7 @@ export const DEFAULT_CONFIG = {
     { id: "lehre", name: "Lehre", icon: "🛠️", incomeLabel: "Lehrlingslohn", income: [2340, 2790, 3330], costLabel: "Kostgeld, ÖV, Kleider", cost: 1500,
       drift: { energie: -13, wertstiftung: 3, zufriedenheit: 1 } },
     { id: "studium", name: "Studium", icon: "🏛️", incomeLabel: "Unterstützung der Eltern", income: [1500], costLabel: "Semestergebühr, ÖV, Bücher", cost: 1000,
-      drift: { energie: -11, zufriedenheit: 2, beziehungen: 1 } },
+      drift: { energie: -13, zufriedenheit: -1, beziehungen: 2 } },
     { id: "arbeit", name: "Berufsleben", icon: "💼", incomeLabel: "Lohn (netto)", income: [12000], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit)", cost: 6000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,
       drift: { energie: -13, wertstiftung: 3 } },
     { id: "job", name: "Job ohne Abschluss", icon: "📦", incomeLabel: "Lohn (netto)", income: [10200], costLabel: "Lebenskosten (Kostgeld, ÖV, Essen, Kleider, Freizeit)", cost: 6000, costDiscountFlag: "ausgezogen", costDiscount: 1500, working: true,

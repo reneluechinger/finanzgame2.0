@@ -29,8 +29,30 @@ const AGE = {
   a_zehnfinger: [12, 16], a_znueni_vorbereiten: [12, 19], a_geschwister_betreuen: [12, 20], a_hausaufgaben_geschwister: [12, 20],
   a_tisch_decken: [12, 19], a_auto_saugen: [12, 19], a_geschwister_vorlesen: [12, 18], a_spielplatz_geschwister: [12, 17],
   b_fussball: [12, 16], b_uebernachtung: [12, 17], b_kastanien: [12, 14], b_rodeln: [12, 20], b_aufgaben_zusammen: [12, 22, 0, LEARN],
-  b_trampolinhalle: [12, 18], b_konzert: [14, 25], b_billard: [14, 25], b_pfadi: [12, 20], b_vogelhaus: [12, 16]
+  b_trampolinhalle: [12, 18], b_konzert: [14, 25], b_billard: [14, 25], b_pfadi: [12, 20], b_vogelhaus: [12, 16],
+  // Freizeit, die erst mit etwas mehr Selbständigkeit möglich ist
+  b_klettern: [13, 25], b_escape_room: [14, 25], b_bowling: [13, 25], b_paddeln: [14, 25], b_freizeitpark: [13, 25],
+  b_onlineshop: [14, 25], b_neues_game: [13, 25], b_musik_produzieren: [14, 25], b_video_schneiden: [13, 25],
+  b_programmieren: [14, 25], a_programmieren: [13, 25], b_kochen: [13, 25], b_grillieren: [14, 25], b_lagerfeuer: [14, 25],
+  kino: [13, 25], b_cafe: [13, 25], b_pizzeria: [14, 25], a_sprachcafe: [15, 25], a_foto_workshop: [14, 25],
+  a_budget_planen: [14, 25], b_wandern: [13, 25], b_velotour: [13, 25], b_tennis: [13, 25], b_malen: [13, 25],
+  b_podcast: [13, 25], b_doku: [13, 25], a_museumsbesuch: [13, 25], b_meditation: [14, 25], b_yoga: [13, 25],
+  a_kochen_familie: [13, 25], a_sonntagsbrunch: [14, 25], a_suppe_kochen: [14, 25], a_pizza_selber: [13, 25]
 };
+// Ereignisse aus v1, die auch für junge Erwachsene passen. Alle anderen enden mit 18.
+const ADULT_OK = new Set(["display", "erkaeltung", "velo", "spende", "streaming", "geburtstag", "sneaker", "turnier",
+  "c_portemonnaie", "c_velo_schloss", "c_kopfhoerer", "c_sale_jacke", "c_gratis_probe", "c_sportabo", "c_leihen_freund",
+  "c_schulden_zurueck", "c_preisvergleich", "c_handyhuelle", "c_kleidung_tausch", "c_konzert_ticket", "c_kaffee_ausgeben",
+  "c_sparziel", "c_teure_marke", "c_brille_kaputt", "c_abo_kuendigen", "c_wechselgeld", "c_lieferdienst", "c_unerwartete_rechnung",
+  "c_gratis_hilfe", "c_gratis_hilfe_fordernd", "c_oma_einkauf", "c_job_vermittler", "d_gruppenchat_streit", "d_freund_traurig",
+  "d_geheimnis_erzaehlt", "d_zwei_einladungen", "d_foto_ohne_fragen", "d_abmachung_vergessen", "d_ausgeschlossen",
+  "d_geburtstag_vergessen", "d_freund_neuer_kreis", "d_spielabend_einladung", "d_entschuldigung_streit", "d_schlecht_geschlafen",
+  "d_kopfweh", "d_sport_knoechel", "d_halsweh_training", "d_spaziergang_kopf", "d_seitenstechen", "d_zu_wenig_trinken",
+  "d_augen_muede", "d_zahnarzt_termin", "d_terminstress", "d_phishing_sms", "d_gewinnspiel_betrug", "d_influencer_werbung",
+  "d_handyzeit_limit", "d_datenschutz_app", "d_hasskommentar", "d_passwort_teilen", "d_fake_shop", "d_fake_video",
+  "d_fake_bewertung", "d_update_sicherheit", "d_aufraeumtag_quartier", "d_seniorin_tragen", "d_fund_portemonnaie",
+  "d_littering_park", "d_lebensmittel_sammlung", "d_bus_senior_platz", "d_recycling_ecke", "d_nachbar_laerm", "d_fundkatze",
+  "d_nachbarskind_velo", "d_schlaf_wochenende", "d_screenshot_chat"]);
 
 const round10 = x => Math.round(x / 10) * 10;
 const activities = v1.activities.map(a => {
@@ -71,6 +93,7 @@ const events = v1.events.map(e => {
   else if (/^c_job_|^c_kunde|^c_trinkgeld|^c_hilfe_umzug/.test(e.id)) o.maxAge = 19;
   else if (/^c_babysit/.test(e.id)) o.maxAge = 22;
   else if (HOME_RX.test(t)) o.maxAge = 21;
+  if (!ADULT_OK.has(e.id) && (!o.maxAge || o.maxAge > 18) && !/^c_babysit/.test(e.id)) o.maxAge = 18;
   for (const opt of o.options) {
     if (opt.addCost) {
       const f = opt.addCost.interval === "woche" ? 13 : 3;

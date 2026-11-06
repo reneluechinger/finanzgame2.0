@@ -77,7 +77,7 @@ test("Steuern ab 18 und Krankenkasse ab 19", () => {
   const young = playGame(5, 12);
   assert.equal(E.taxFor(cfg, young, 9000), 0);
   assert.equal(E.taxFor(cfg, { flags: {} }, 60000), 4000);
-  assert.equal(E.taxFor(cfg, { flags: { saeule3a: { from: 1 } } }, 60000), 3440);
+  assert.equal(E.taxFor(cfg, { flags: {}, deductions: { 20: 2000 } }, 60000, 20), 3840);
 });
 
 test("Lehrlingslohn steigt mit jedem Lehrjahr", () => {
@@ -146,19 +146,20 @@ test("Seltene Aktivitäten erscheinen etwa so oft wie eingestellt", () => {
   const N = 200000;
   for (let i = 0; i < N; i++) {
     const st = { started: "s" + i, day: 1 };
-    if (E.rareAppears(st, israel, "abend")) ultra++;
-    if (E.rareAppears(st, konzert, "abend")) selten++;
+    if (E.SLOTS.some(sl => E.rareAppears(st, israel, sl))) ultra++;
+    if (E.SLOTS.some(sl => E.rareAppears(st, konzert, sl))) selten++;
+    assert.ok(E.SLOTS.filter(sl => E.rareAppears(st, israel, sl)).length <= 1);
   }
   assert.ok(ultra / N > 0.0005 && ultra / N < 0.002, "ultra " + ultra / N);
   assert.ok(selten / N > 0.04 && selten / N < 0.06, "selten " + selten / N);
 });
 
-test("Spende an Israel: braucht Fr. 5000 inkl. Sparkonto, gibt +20 auf die anderen Werte", () => {
+test("Spende an Israel: braucht Fr. 10 000 inkl. Sparkonto, gibt +20 auf die anderen Werte", () => {
   const st = E.newGame(cfg, "t", "x", 12);
   const act = cfg.activities.find(a => a.id === "r_spende_israel");
-  st.konto = 1000; st.spar = 3000;
+  st.konto = 1000; st.spar = 8000;
   assert.equal(E.activityStatus(cfg, st, act, "abend").ok, false);
-  st.spar = 4000;
+  st.spar = 9000;
   assert.equal(E.activityStatus(cfg, st, act, "abend").ok, true);
   for (const id of ["zufriedenheit", "wertstiftung", "energie", "beziehungen"]) assert.equal(act.effects[id], 20);
 });
@@ -224,4 +225,37 @@ test("Alle Inhalte sind gültig", () => {
   }
   const phaseIds = new Set(cfg.phases.map(p => p.id));
   for (const e of cfg.events) for (const o of e.options) if (o.setPhase) assert.ok(phaseIds.has(o.setPhase), e.id);
+});
+
+test("Betreibung kommt sicher nach 2 Quartalen mit Schulden (ab 18)", () => {
+  const st = E.newGame(cfg, "t", "x", 16);
+  st.seenEvents.push(...cfg.events.filter(e => e.milestone).map(e => e.id));
+  st.day = 9; st.konto = -2000; st.spar = 0;
+  E.startDay(cfg, st, () => 0.9);
+  assert.notEqual(st.event, "g_betreibung");
+  st.day = 10;
+  E.startDay(cfg, st, () => 0.9);
+  assert.equal(st.event, "g_betreibung");
+});
+
+test("Geld-Wert springt am Geburtstag nicht", () => {
+  const st = E.newGame(cfg, "t", "x", 16);
+  st.konto = 3000; st.spar = 0;
+  const vals = [];
+  for (let d = 9; d <= 16; d++) { st.day = d; vals.push(E.moneyValue(cfg, st)); }
+  for (let i = 1; i < vals.length; i++) assert.ok(vals[i - 1] - vals[i] <= 15, vals.join(","));
+});
+
+test("Ausruhen darf man mehrmals pro Quartal wählen", () => {
+  const st = E.newGame(cfg, "t", "x", 12);
+  const r = cfg.activities.find(a => a.id === "ausruhen");
+  st.plan = { nachmittag: "ausruhen" };
+  assert.equal(E.activityStatus(cfg, st, r, "abend").ok, true);
+});
+
+test("Kreditkarte und Leasing sind sichere Entscheidungen, Berufswahl vor anderen Meilensteinen", () => {
+  for (const id of ["g_kreditkarte", "g_leasing"]) assert.ok(cfg.events.find(e => e.id === id).milestone, id);
+  const st = playGame(7, 14, s => (s.event === "m_berufswahl" ? 1 : 0));
+  const at18 = st.history.filter(h => h.age === 18 && h.event).map(h => h.event.id);
+  assert.equal(at18[0], "m_matura");
 });

@@ -6,7 +6,7 @@ import { renderEditor } from "./editor.js";
 
 const app = document.getElementById("app");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fr = n => (n < 0 ? "−" : "") + "Fr. " + Math.abs(n).toLocaleString("de-CH", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).replace(/’/g, "'");
+const fr = n => { const a = Math.abs(n), dec = Math.round(a * 100) % 100 ? 2 : 0; return (n < 0 ? "−" : "") + "Fr. " + a.toLocaleString("de-CH", { minimumFractionDigits: dec, maximumFractionDigits: dec }).replace(/’/g, "'"); };
 
 let cfg, variant, state = null;
 let activeSlot = null;
@@ -154,7 +154,7 @@ function showGame() {
             <div class="act locked" aria-disabled="true">
               <b>🔒 ${esc(a.icon)} ${esc(a.name)}</b>
               <small>${effectText(a)}</small>
-              <em>Ab ${esc(a.minAge)} Jahren</em>
+              <em>Ab ${esc(a.minAge)} Jahren${a.requires ? `, ${esc((a.lockedInfo || "braucht Vorbereitung").replace(/^Braucht/, "braucht"))}` : ""}</em>
             </div>`).join("")}
         </div>
         <p class="tip">${tired ? `⚠️ Du bist müde: Positive Effekte wirken nur halb. Gönn dir Erholung.` :
@@ -202,7 +202,7 @@ function renderModal() {
     return `<div class="overlay"><div class="dialog sans">
       <h2>💰 Sparkonto</h2>
       <p>Konto: <b>${fr(state.konto)}</b> · Sparkonto: <b>${fr(state.spar)}</b></p>
-      <p class="small">Jedes Quartal gibt es ${esc(cfg.interestPercent)} % Zins auf das Sparkonto (Spiel-Zins, auf echten Konten ist er viel tiefer). Geld auf dem Sparkonto kannst du nicht für Aktivitäten ausgeben, es hilft aber bei Notfällen. Ist dein Konto im Minus, zahlst du ${esc(cfg.debtInterestPercent)} % Schuldzins pro Quartal.</p>
+      <p class="small">Jedes Quartal gibt es ${esc(cfg.interestPercent)} % Zins auf das Sparkonto (Spiel-Zins, auf echten Konten ist er viel tiefer). Geld auf dem Sparkonto kannst du nicht für Aktivitäten ausgeben (ausser für wenige besondere), es hilft aber bei Notfällen. Ist dein Konto im Minus, zahlst du ${esc(cfg.debtInterestPercent)} % Schuldzins pro Quartal.</p>
       <div class="row">${steps.map(n => `<button class="btn ghost" data-a="sparen" data-n="${n}">+${n} sparen</button>`).join("")}<button class="btn ghost" data-a="sparen-alles">Alles sparen</button></div>
       <div class="row">${steps.map(n => `<button class="btn ghost" data-a="sparen" data-n="${-n}">${n} zurückholen</button>`).join("")}</div>
       <button class="btn primary" data-a="close">Fertig</button>
@@ -243,9 +243,9 @@ function showReview() {
   const ageNow = E.ageAt(state, from), ageNext = ageNow + 1;
   const q = cfg.questions.length ? cfg.questions[(year - 1) % cfg.questions.length] : "";
   const scStart = before ? before.score : null, scEnd = hist.at(-1)?.score ?? 0;
-  const unlocks = E.unlocksAtAge(cfg, ageNext);
+  const unlocks = E.unlocksAtAge(cfg, ageNext, state);
   const income = state.income[ageNow] || 0;
-  const taxNext = cfg.tax && ageNow >= cfg.tax.fromAge ? E.taxFor(cfg, state, income) : null;
+  const taxNext = cfg.tax && ageNow >= cfg.tax.fromAge ? E.taxFor(cfg, state, income, ageNow) : null;
   app.innerHTML = `
   <div class="screen review">
     <h1 class="logo">Rückblick: Dein Jahr mit ${ageNow}</h1>
@@ -414,7 +414,7 @@ function showHelp() {
       <p><b>Ein Spieltag ist ein Quartal</b> (3 Monate), vier Spieltage sind ein Jahr. Du wählst, was du in dieser Zeit regelmässig machst: am Nachmittag, am Abend und am Wochenende. Die gestrichelte Linie zeigt dir, wie sich deine Werte verändern.</p>
       <p><b>Älter werden:</b> Viele Aktivitäten sind am Anfang gesperrt (🔒 ab 16). Mit jedem Geburtstag kommen neue dazu, und die Jobs werden besser bezahlt. Ausruhen geht immer.</p>
       <p><b>Lebensphasen:</b> Zuerst gehst du in die Oberstufe. Mit 16 wählst du Lehre oder Gymnasium, mit 18 nach dem Gymnasium Studium oder Arbeit. Jede Phase bringt Geld und kostet Energie.</p>
-      <p><b>Erwachsen werden:</b> Ab ${esc(cfg.tax?.fromAge ?? 18)} zahlst du Steuern, ab 19 die Krankenkasse selbst. Verträge wie Leasing, Kreditkarte oder Ratenkauf kosten oft mehr, als man denkt. Alle Beträge sind vereinfacht.</p>
+      <p><b>Erwachsen werden:</b> Ab ${esc(cfg.tax?.fromAge ?? 18)} zahlst du Steuern (die Rechnung kommt jeweils im Jahr danach), ab 19 die Krankenkasse selbst. Verträge wie Leasing, Kreditkarte oder Ratenkauf kosten oft mehr, als man denkt. Alle Beträge sind vereinfacht.</p>
       ${wert ? `<p><b>${esc(wert.name)}</b> bedeutet: Du schaffst Nutzen für andere. Manchmal wirst du dafür bezahlt, manchmal nicht.</p>` : ""}
       <p><b>Selten:</b> Manche Aktivitäten tauchen nur ab und zu auf (✨ selten, sehr selten, ultra-selten). Greif zu, wenn es passt.</p>
       <p><b>Energie:</b> Ist sie unter ${esc(cfg.lowEnergyLimit)}, wirken gute Effekte nur halb.${pct > 0 ? ` Energie-Kosten sind in dieser Version um ${pct} % kleiner.` : ""} Hohe Werte steigen langsamer.</p>

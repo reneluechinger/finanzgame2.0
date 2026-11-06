@@ -1,4 +1,4 @@
-// Spielt fünf Strategien je 30-mal durch (Start mit 12 und mit 16), um die Zahlen abzustimmen: node tests/sim.mjs
+// Spielt sechs Strategien je 30-mal durch (Start mit 12 und mit 16), um die Zahlen abzustimmen: node tests/sim.mjs
 import { DEFAULT_CONFIG as cfg } from "../js/config.js";
 import * as E from "../js/engine.js";
 if (process.env.OVR) Object.assign(cfg, JSON.parse(process.env.OVR));
@@ -18,6 +18,8 @@ const strategies = {
   nurArbeit: { act: (st, ok) => best(ok, a => a.money || 0), ev: "zufall" },
   nurSpass: { act: (st, ok) => best(ok, a => a.effects?.zufriedenheit || 0), ev: "zufall" },
   zufall: { act: (st, ok, rng) => ok[Math.floor(rng() * ok.length)], ev: "zufall" },
+  // Faustregel: Abend immer ausruhen, sonst zufällig
+  faustregel: { act: (st, ok, rng, slot) => (slot === "abend" && ok.find(a => a.id === "ausruhen")) || ok[Math.floor(rng() * ok.length)], ev: "zufall" },
   ausgewogen: {
     act: (st, ok) => {
       const v = E.allValues(cfg, st);

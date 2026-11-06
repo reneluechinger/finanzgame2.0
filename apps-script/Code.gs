@@ -44,7 +44,7 @@ function doPost(e) {
     const score = Math.round(Number(d.score));
     const variant = String(d.variant || "").slice(0, 12);
     const startAge = d.startAge != null && Number(d.startAge) >= 0 && Number(d.startAge) <= 99 ? Math.round(Number(d.startAge)) : "";
-    // Kennung des Durchgangs: derselbe Monat wird nur einmal eingetragen
+    // Kennung des Durchgangs: derselbe Durchgang wird nur einmal eingetragen
     // Mit Vorsatz gespeichert, damit Google Sheets den Text nicht in ein Datum umwandelt
     const run = d.started ? "run:" + String(d.started).slice(0, 40) : "";
     if (!name || !(score >= 0 && score <= 100)) return json_({ ok: false, error: "Ungültiger Eintrag" });

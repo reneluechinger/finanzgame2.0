@@ -37,7 +37,9 @@ export function moneyTarget(cfg, age) {
 }
 
 export function moneyValue(cfg, state) {
-  const age = ageAt(state, Math.min(state.day, totalDays(cfg, state)));
+  // Pro Quartal gerechnet, damit der Geld-Wert am Geburtstag nicht springt
+  const day = Math.min(state.day, totalDays(cfg, state));
+  const age = ageAt(state, day) + quarterIndex(day) / 4;
   return clamp(Math.round((state.konto + state.spar) / moneyTarget(cfg, age) * 100));
 }
 
@@ -128,10 +130,11 @@ export function phaseIncome(cfg, state) {
   return Math.round(p.working ? base * (1 + (state.incomeBonus || 0)) : base);
 }
 
-export function taxFor(cfg, state, income) {
+// Steuern auf das Einkommen eines Lebensjahres, abzüglich Einzahlungen (z.B. Säule 3a) in diesem Jahr
+export function taxFor(cfg, state, income, age = null) {
   const t = cfg.tax;
   if (!t) return 0;
-  const deduction = state.flags.saeule3a ? (t.saeule3aDeduction || 0) : 0;
+  const deduction = age != null ? (state.deductions?.[age] || 0) : 0;
   return Math.max(0, round10((income - (t.freeAmount || 0) - deduction) * (t.rate || 0) / 100));
 }
 
@@ -145,9 +148,9 @@ export function startDay(cfg, state, rng = Math.random) {
     state.log.push(`🎂 Du bist jetzt ${age}.`);
     const prev = age - 1;
     if (cfg.tax && prev >= cfg.tax.fromAge) {
-      const t = taxFor(cfg, state, state.income[prev] || 0);
-      if (t > 0) { pay(state, t); addPaid(state, "Steuern", t); }
-      state.log.push(`Steuern für das Jahr mit ${prev}: −Fr. ${t}`);
+      const t = taxFor(cfg, state, state.income[prev] || 0, prev);
+      if (t > 0) { pay(state, t); addPaid(state, "Steuern", t); state.log.push(`Steuern für das Jahr mit ${prev}: −Fr. ${t}`); }
+      else state.log.push(`Keine Steuern für das Jahr mit ${prev} (Einkommen unter dem Freibetrag)`);
     }
   }
   if (state.day > 1) {
@@ -192,6 +195,7 @@ export function startDay(cfg, state, rng = Math.random) {
     addPaid(state, c.name, c.amount);
     state.log.push(`${c.name}: −Fr. ${c.amount}`);
   }
+  state.debtQuarters = state.konto + state.spar < 0 ? (state.debtQuarters || 0) + 1 : 0;
   state.event = pickEvent(cfg, state, rng);
 }
 
@@ -200,20 +204,29 @@ function pickEvent(cfg, state, rng) {
   const seen = id => state.seenEvents.includes(id);
   const inAge = e => (!e.minAge || age >= e.minAge) && (!e.maxAge || age <= e.maxAge);
   const okPhase = e => !e.phases?.length || e.phases.includes(state.phase);
-  // Meilensteine zuerst: Sie kommen sicher, sobald das Alter erreicht ist
+  // Dringende Ereignisse (z.B. Betreibung bei Schulden) kommen sofort
+  const urgent = (cfg.events || []).find(e => e.urgent && !seen(e.id) && inAge(e) && okPhase(e) && conditionOk(state, e.condition));
+  if (urgent) return urgent.id;
+  // Meilensteine: Sie kommen sicher, sobald das Alter erreicht ist. Wechsel der Lebensphase zuerst.
+  const changesPhase = e => e.options.some(o => o.setPhase);
   const milestones = (cfg.events || []).filter(e => e.milestone && e.atAge && age >= e.atAge && !seen(e.id) && okPhase(e) && conditionOk(state, e.condition))
-    .sort((a, b) => a.atAge - b.atAge);
+    .sort((a, b) => a.atAge - b.atAge || changesPhase(b) - changesPhase(a));
   if (milestones.length) return milestones[0].id;
   if (state.day === 1 || rng() >= 0.5) return null;
   const seenGroups = cfg.events.filter(e => e.group && seen(e.id)).map(e => e.group);
-  const pool = (cfg.events || []).filter(e => !e.milestone && !seen(e.id) && !(e.group && seenGroups.includes(e.group))
+  const pool = (cfg.events || []).filter(e => !e.milestone && !e.urgent && !seen(e.id) && !(e.group && seenGroups.includes(e.group))
     && inAge(e) && okPhase(e) && conditionOk(state, e.condition));
-  return pool.length ? pool[Math.floor(rng() * pool.length)].id : null;
+  if (!pool.length) return null;
+  // Ereignisse, die zum Alter passen (minAge nahe am Alter), kommen häufiger
+  const weight = e => (e.minAge && e.minAge >= 16 && age >= 16 ? 3 : 1);
+  let r = rng() * pool.reduce((s, e) => s + weight(e), 0);
+  for (const e of pool) { r -= weight(e); if (r < 0) return e.id; }
+  return pool.at(-1).id;
 }
 
 function conditionOk(state, cond) {
   if (!cond) return true;
-  if (cond.debt && state.konto + state.spar >= 0) return false;
+  if (cond.debt && !((state.debtQuarters || 0) >= 2)) return false; // mindestens 2 Quartale im Minus
   if (!cond.flag) return true;
   return cond.not ? !flagActive(state, cond.flag) : flagActive(state, cond.flag);
 }
@@ -245,9 +258,14 @@ export function chooseEventOption(cfg, state, index) {
   if (!opt || !eventOptionsAffordable(state, ev)[index]) return;
   if (opt.money) {
     if (opt.money < 0) pay(state, -opt.money);
-    else { state.konto = round1(state.konto + opt.money); addIncome(state, opt.money); }
+    else { state.konto = round1(state.konto + opt.money); if (opt.taxable) addIncome(state, opt.money); }
   }
   if (opt.savings) state.spar = round1(state.spar + opt.savings);
+  if (opt.taxDeduction) {
+    const age = ageAt(state);
+    state.deductions = state.deductions || {};
+    state.deductions[age] = (state.deductions[age] || 0) + opt.taxDeduction;
+  }
   if (opt.addCost) {
     const c = { ...opt.addCost, added: state.day + 1 };
     if (c.quarters) c.until = state.day + c.quarters;
@@ -279,7 +297,7 @@ export function activityStatus(cfg, state, act, slot) {
   if (act.requires && !flagActive(state, act.requires)) return { ok: false, reason: act.lockedInfo || "Noch nicht freigeschaltet" };
   if (act.once && state.history.some(h => h.acts.includes(act.id))) return { ok: false, reason: "Schon erledigt" };
   const planned = Object.entries(state.plan).filter(([s]) => s !== slot).map(([, id]) => id);
-  if (planned.includes(act.id)) return { ok: false, reason: "Dieses Quartal schon gewählt" };
+  if (planned.includes(act.id) && !act.core) return { ok: false, reason: "Dieses Quartal schon gewählt" };
   if (act.money < 0) {
     const spent = planned.map(id => cfg.activities.find(a => a.id === id)).reduce((s, a) => s + Math.min(0, a?.money || 0), 0);
     const cash = state.konto + (act.useSavings ? state.spar : 0);
@@ -301,11 +319,14 @@ function seededRng(text) {
 // Welche Job-Stufe passt zum Alter: früh einfache Jobs, später bessere
 export const expectedTier = age => (age < 15 ? 1 : age < 18 ? 2 : 3);
 
-// Seltene Aktivitäten erscheinen nur, wenn das Los für diesen Tag und dieses Zeitfenster passt
+// Seltene Aktivitäten: einmal pro Quartal wird gelost. Erscheinen sie, dann in einem ihrer Zeitfenster.
 export function rareAppears(state, act, slot) {
   const r = RARITY[act.rarity];
   if (!r) return true;
-  return seededRng(`${state.started}|${state.day}|${slot}|${act.id}`)() < r.chance;
+  const rng = seededRng(`${state.started}|${state.day}|${act.id}`);
+  if (rng() >= r.chance) return false;
+  const when = act.when || [];
+  return when[Math.floor(rng() * when.length)] === slot;
 }
 
 // Aktivitäten, die in diesem Quartal in diesem Zeitfenster angeboten werden.
@@ -352,8 +373,8 @@ export function lockedActivities(cfg, state, slot) {
 }
 
 // Was mit einem bestimmten Alter neu dazukommt (für den Jahresrückblick)
-export function unlocksAtAge(cfg, age) {
-  return cfg.activities.filter(a => a.minAge === age && !a.rarity && !a.requires);
+export function unlocksAtAge(cfg, age, state = null) {
+  return cfg.activities.filter(a => a.minAge === age && !a.rarity && !a.requires && (!state || phaseFits(a, state)));
 }
 
 function simulateDay(cfg, state) {

@@ -163,7 +163,7 @@ export function sanitizeConfig(cfg) {
   c.softCap = n(c.softCap, 0, 99, D.softCap);
   c.lockedPreview = Math.round(n(c.lockedPreview, 0, 10, D.lockedPreview));
   const t = c.tax && typeof c.tax === "object" ? c.tax : D.tax;
-  c.tax = { fromAge: n(t.fromAge, 0, 100, 18), freeAmount: n(t.freeAmount, 0, 10000000, 0), rate: n(t.rate, 0, 100, 0), saeule3aDeduction: n(t.saeule3aDeduction, 0, 1000000, 0) };
+  c.tax = { fromAge: n(t.fromAge, 0, 100, 18), freeAmount: n(t.freeAmount, 0, 10000000, 0), rate: n(t.rate, 0, 100, 0) };
   const effects = e => Object.fromEntries(Object.entries(e && typeof e === "object" ? e : {})
     .map(([k, v]) => [str(k, 40), n(v, -100, 100, 0)]));
   c.values = (Array.isArray(c.values) ? c.values : []).map(v => ({
@@ -201,13 +201,14 @@ export function sanitizeConfig(cfg) {
   c.events = (Array.isArray(c.events) ? c.events : []).map(e => prune({
     ...e, id: str(e.id, 40), icon: str(e.icon, 8), text: str(e.text, 300),
     minAge: opt(e.minAge, 0, 100), maxAge: opt(e.maxAge, 0, 100), atAge: opt(e.atAge, 0, 100),
-    milestone: e.milestone && e.atAge ? true : undefined, phases: strList(e.phases),
+    milestone: e.milestone && e.atAge ? true : undefined, phases: strList(e.phases), urgent: e.urgent ? true : undefined,
     condition: e.condition && typeof e.condition === "object" && (e.condition.flag || e.condition.debt)
       ? prune({ flag: str(e.condition.flag, 40) || undefined, not: e.condition.not ? true : undefined, debt: e.condition.debt ? true : undefined }) : undefined,
     options: (Array.isArray(e.options) ? e.options : []).map(o => prune({
       ...o, label: str(o.label, 120), money: n(o.money, -1000000, 1000000, 0), savings: n(o.savings, 0, 1000000, 0),
       effects: effects(o.effects), setPhase: str(o.setPhase, 40) || undefined, flag: str(o.flag, 40) || undefined,
       removeFlag: str(o.removeFlag, 40) || undefined, incomeBonus: opt(o.incomeBonus, -1, 5),
+      taxDeduction: opt(o.taxDeduction, 0, 1000000), taxable: o.taxable ? true : undefined,
       addCost: o.addCost ? prune({ name: str(o.addCost.name, 60), amount: n(o.addCost.amount, 0, 1000000, 0), interval: costIv(o.addCost.interval), quarters: opt(o.addCost.quarters, 1, 400) }) : undefined
     }))
   }));

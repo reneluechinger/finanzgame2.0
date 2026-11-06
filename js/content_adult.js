@@ -77,9 +77,9 @@ export const ADULT_ACTIVITIES = [
     effects: { zufriedenheit: 10, wertstiftung: 8, energie: -6, beziehungen: 4 }, info: "So eine Chance kommt selten" },
   { id: "r_kunstwerk", name: "Eigenes Bild an einer Ausstellung verkaufen", icon: "🖼️", when: ["wochenende"], money: 800, rarity: "sehr selten",
     effects: { zufriedenheit: 12, wertstiftung: 5, beziehungen: 3 } },
-  { id: "r_spende_israel", name: "Geld an Israel spenden", icon: "🕊️", when: ALL, money: -5000, rarity: "ultra", useSavings: true,
+  { id: "r_spende_israel", name: "Geld an Israel spenden", icon: "🕊️", when: ALL, money: -10000, rarity: "ultra", useSavings: true,
     effects: { zufriedenheit: 20, wertstiftung: 20, energie: 20, beziehungen: 20 },
-    info: "Kostet Fr. 5000, auch vom Sparkonto. Alle anderen Werte +20." }
+    info: "Kostet Fr. 10 000, auch vom Sparkonto. Alle anderen Werte +20." }
 ];
 
 export const ADULT_EVENTS = [
@@ -96,8 +96,8 @@ export const ADULT_EVENTS = [
     text: "Matura bestanden! Studium oder gleich arbeiten?", options: [
       { label: "Studium (bis 22, wenig Geld)", setPhase: "studium", effects: { zufriedenheit: 5, wertstiftung: 3 } },
       { label: "Direkt arbeiten (Job ohne Berufsabschluss)", setPhase: "job", effects: { zufriedenheit: 2 } } ] },
-  { id: "m_krankenkasse", milestone: true, atAge: 19, icon: "🏥",
-    text: "Ab jetzt zahlst du deine Krankenkasse selbst, im Schnitt rund Fr. 326 im Monat. Welche Franchise wählst du?", options: [
+  { id: "m_krankenkasse", milestone: true, atAge: 18, icon: "🏥",
+    text: "Ab 19 zahlst du deine Krankenkasse selbst, im Schnitt rund Fr. 326 im Monat. Welche Franchise wählst du?", options: [
       { label: "Franchise Fr. 300 (höhere Prämie)", effects: { zufriedenheit: 1 } },
       { label: "Franchise Fr. 2500 (Fr. 100 weniger Prämie pro Monat)", flag: "franchise_hoch", effects: {} } ] },
   { id: "m_lehrabschluss", milestone: true, atAge: 19, phases: ["lehre"], icon: "🎓",
@@ -115,13 +115,13 @@ export const ADULT_EVENTS = [
       { label: "Hilfswerk, weniger Lohn, viel Sinn", setPhase: "akademisch", incomeBonus: -0.15, effects: { zufriedenheit: 6, wertstiftung: 10 } } ] },
 
   // --- Geld und Verträge ab 18 ---
-  { id: "g_kreditkarte", minAge: 18, icon: "💳", text: "Eine Bank bietet dir eine Kreditkarte an, mit Fr. 50 Startbonus.", options: [
+  { id: "g_kreditkarte", milestone: true, atAge: 19, icon: "💳", text: "Eine Bank bietet dir eine Kreditkarte an, mit Fr. 50 Startbonus.", options: [
     { label: "Annehmen", money: 50, flag: "kreditkarte", effects: { zufriedenheit: 3 } },
     { label: "Ablehnen, die Debitkarte reicht", effects: { wertstiftung: 1 } } ] },
   { id: "g_kreditkarte_rechnung", minAge: 18, condition: { flag: "kreditkarte" }, icon: "🧾", text: "Die Kreditkartenrechnung ist höher als gedacht: Fr. 900.", options: [
     { label: "Ganz bezahlen", money: -900, effects: { zufriedenheit: -2 } },
-    { label: "Nur Fr. 90 zahlen, der Rest kostet rund 12 % Zins", money: -90, addCost: { name: "Kreditkartenschuld", amount: 270, interval: "quartal", quarters: 4 }, effects: { zufriedenheit: 1 } } ] },
-  { id: "g_leasing", minAge: 18, icon: "🚙", text: "Ein Autohändler bietet ein Leasing an: keine Anzahlung, Fr. 390 im Monat für 4 Jahre.", options: [
+    { label: "Nur Fr. 90 zahlen, Rest in Raten mit rund 12 % Jahreszins (zusammen Fr. 950)", money: -90, addCost: { name: "Kreditkartenschuld", amount: 215, interval: "quartal", quarters: 4 }, effects: { zufriedenheit: 1 } } ] },
+  { id: "g_leasing", milestone: true, atAge: 21, icon: "🚙", text: "Ein Autohändler bietet ein Leasing an: keine Anzahlung, Fr. 390 im Monat für 4 Jahre.", options: [
     { label: "Leasing abschliessen", flag: "auto", addCost: { name: "Leasing", amount: 1170, interval: "quartal", quarters: 16 }, effects: { zufriedenheit: 10, energie: 3 } },
     { label: "Occasion bar kaufen (Fr. 6000)", money: -6000, flag: "auto", effects: { zufriedenheit: 6, energie: 3 } },
     { label: "ÖV und Velo reichen", effects: { wertstiftung: 2 } } ] },
@@ -132,7 +132,7 @@ export const ADULT_EVENTS = [
     { label: "Bar bezahlen (Fr. 1200)", money: -1200, effects: { zufriedenheit: 8 } },
     { label: "In Raten (zusammen Fr. 1416)", addCost: { name: "Handy-Raten", amount: 177, interval: "quartal", quarters: 8 }, effects: { zufriedenheit: 8 } },
     { label: "Altes Handy behalten", effects: { zufriedenheit: -2 } } ] },
-  { id: "g_betreibung", minAge: 18, condition: { debt: true }, icon: "⚠️", text: "Du hast Rechnungen nicht bezahlt. Jetzt kommt eine Betreibung. Sie steht im Register und stört bei der Wohnungssuche.", options: [
+  { id: "g_betreibung", urgent: true, minAge: 18, condition: { debt: true }, icon: "⚠️", text: "Du hast Rechnungen nicht bezahlt. Jetzt kommt eine Betreibung. Sie steht im Register und stört bei der Wohnungssuche.", options: [
     { label: "Bei der Schuldenberatung Hilfe holen", effects: { zufriedenheit: -3, beziehungen: 2, energie: -2 } },
     { label: "Ignorieren (Gebühren Fr. 150)", money: -150, effects: { zufriedenheit: -8, beziehungen: -4 } } ] },
   { id: "g_steuererklaerung", minAge: 18, icon: "📑", text: "Deine erste Steuererklärung liegt auf dem Tisch. Viele Formulare.", options: [
@@ -140,12 +140,12 @@ export const ADULT_EVENTS = [
     { label: "Steuerberatung bezahlen (Fr. 150)", money: -150 },
     { label: "Liegen lassen (Busse Fr. 200)", money: -200, effects: { zufriedenheit: -4 } } ] },
   { id: "g_saeule3a", minAge: 19, phases: ["arbeit", "job", "akademisch"], icon: "🏦", text: "Deine Bank empfiehlt eine Säule 3a. Einzahlungen kannst du von den Steuern abziehen.", options: [
-    { label: "Fr. 2000 in die Säule 3a", money: -2000, savings: 2000, flag: "saeule3a", effects: { zufriedenheit: 2 } },
+    { label: "Fr. 2000 in die Säule 3a (dieses Jahr Fr. 2000 weniger steuerbares Einkommen)", money: -2000, savings: 2000, taxDeduction: 2000, effects: { zufriedenheit: 2 } },
     { label: "Jetzt noch nicht", effects: {} } ] },
   { id: "g_krypto", minAge: 18, icon: "🪙", text: "Ein Kollege schwärmt von einer Kryptomünze. Sie sei schon um das Zehnfache gestiegen.", options: [
     { label: "Fr. 1000 investieren", money: -1000, flag: "krypto", effects: { zufriedenheit: 3 } },
     { label: "Lieber nicht", effects: {} } ] },
-  { id: "g_krypto_verlust", group: "krypto_ende", minAge: 18, condition: { flag: "krypto" }, icon: "📉", text: "Die Kryptomünze ist um 80 % gefallen.", options: [
+  { id: "g_krypto_verlust", group: "krypto_ende", minAge: 18, condition: { flag: "krypto" }, icon: "📉", text: "Die Kryptomünze ist um 80 % gefallen. (Gewinne und Verluste mit privatem Vermögen sind in der Schweiz steuerfrei bzw. nicht abziehbar.)", options: [
     { label: "Verkaufen (Fr. 200 zurück)", money: 200, removeFlag: "krypto", effects: { zufriedenheit: -6 } } ] },
   { id: "g_krypto_gewinn", group: "krypto_ende", minAge: 18, condition: { flag: "krypto" }, icon: "📈", text: "Glück gehabt: Die Kryptomünze ist gestiegen.", options: [
     { label: "Verkaufen (Fr. 1800 zurück)", money: 1800, removeFlag: "krypto", effects: { zufriedenheit: 6 } } ] },
@@ -179,7 +179,7 @@ export const ADULT_EVENTS = [
     { label: "Bis spät lernen", effects: { energie: -10, zufriedenheit: 2 } },
     { label: "Wird schon gehen", effects: { zufriedenheit: -7 } } ] },
   { id: "g_ueberstunden", minAge: 16, phases: ["lehre", "arbeit", "job"], icon: "⏱️", text: "Im Betrieb ist Hochbetrieb. Die Chefin fragt, ob du Überstunden machst.", options: [
-    { label: "Ja (Fr. 300 extra)", money: 300, effects: { energie: -8, wertstiftung: 3, beziehungen: 2 } },
+    { label: "Ja (Fr. 300 extra)", money: 300, taxable: true, effects: { energie: -8, wertstiftung: 3, beziehungen: 2 } },
     { label: "Nein, ich brauche Erholung", effects: { energie: 2, beziehungen: -2 } } ] },
   { id: "g_lohnabrechnung", minAge: 19, phases: ["arbeit", "job", "akademisch"], icon: "📄", text: "Auf deiner Lohnabrechnung gehen AHV, Arbeitslosenversicherung und Pensionskasse ab. Netto ist weniger als abgemacht.", options: [
     { label: "Nachfragen und verstehen", effects: { wertstiftung: 2, zufriedenheit: 2, energie: -2 } },

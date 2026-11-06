@@ -79,7 +79,6 @@ function body() {
         ${num("tax.fromAge", d.tax?.fromAge, "Ab Alter")}
         ${num("tax.freeAmount", d.tax?.freeAmount, "Freibetrag pro Jahr (Fr.)")}
         ${num("tax.rate", d.tax?.rate, "Satz (%)", 0.5)}
-        ${num("tax.saeule3aDeduction", d.tax?.saeule3aDeduction, "Abzug mit Säule 3a (Fr.)")}
       </div>
       <h3>Was jedes Quartal automatisch passiert</h3>
       <p class="small">Zusätzlich wirkt die Lebensphase (Reiter «Lebensphasen»).</p>${driftInputs("everyDay")}
@@ -130,6 +129,16 @@ function body() {
           </div>`}
         </details>`).join("")}
       <button class="btn ghost" data-e="add-phase">+ Lebensphase hinzufügen</button>
+    </section>
+    <section class="card">
+      <h2>Was sich mit dem Alter ändert</h2>
+      <p class="small">Wirkung pro Quartal ab einem Alter, z.B. «Noch zuhause» ab 21, solange das Merkmal «ausgezogen» fehlt.</p>
+      ${(d.ageDrift || []).map((x, i) => `<div class="opt-box">
+        <div class="grid3">${txt(`ageDrift.${i}.label`, x.label, "Name")}${num(`ageDrift.${i}.fromAge`, x.fromAge, "ab Alter")}${num(`ageDrift.${i}.toAge`, x.toAge, "bis Alter (0 = immer)")}
+          ${txt(`ageDrift.${i}.ifFlag`, x.ifFlag, "nur mit Merkmal")}${txt(`ageDrift.${i}.ifNotFlag`, x.ifNotFlag, "nur ohne Merkmal")}</div>
+        ${effectInputs(`ageDrift.${i}`, x.effects)}
+        <button class="btn danger small" data-e="del-agedrift" data-i="${i}">Entfernen</button></div>`).join("")}
+      <button class="btn ghost" data-e="add-agedrift">+ Altersregel hinzufügen</button>
     </section>`;
 
   if (tab === "akt") return `
@@ -282,7 +291,7 @@ function setPath(obj, path, value) {
     o = o[k];
   }
   const last = keys.at(-1);
-  if (value === undefined || value === "" || value === 0 && /effects|drift|savings|duration|Age$|tier|incomeBonus|quarters|discount$|costDiscount$/.test(path)) delete o[last];
+  if (value === undefined || value === "" || value === 0 && !path.startsWith("tax.") && /effects|drift|savings|duration|Age$|tier|incomeBonus|quarters|discount$|costDiscount$|taxDeduction/.test(path)) delete o[last];
   else o[last] = value;
 }
 
@@ -380,7 +389,8 @@ async function onClick(ev) {
       const errors = S.validateConfig(cleanup(draft));
       if (errors.length) return msg(errors.join(" "), true);
       // Neuer Name = neue Variante mit eigener Bestenliste (z.B. für eine weitere Klasse)
-      const renamed = draft.name !== savedName;
+      // Auch die erste eigene Anpassung der Standard-Variante bekommt eine eigene Bestenliste
+      const renamed = draft.name !== savedName || draft.vid === "std";
       if (renamed) draft.vid = S.newVariantId();
       onSaveCb(structuredClone(draft));
       savedName = draft.name;
@@ -429,6 +439,8 @@ async function onClick(ev) {
     case "add-opt": structural(() => draft.events[i].options.push({ label: "Neue Wahl", effects: {} })); break;
     case "del-opt": structural(() => draft.events[i].options.splice(j, 1)); break;
     case "add-cost": structural(() => draft.costs.push({ name: "Neue Kosten", amount: 30, interval: "quartal" })); break;
+    case "add-agedrift": structural(() => (draft.ageDrift = draft.ageDrift || []).push({ label: "Neue Regel", fromAge: 18, effects: {} })); break;
+    case "del-agedrift": structural(() => draft.ageDrift.splice(i, 1)); break;
     case "add-q": structural(() => draft.questions.push("Neue Frage")); break;
     case "del-q": structural(() => draft.questions.splice(i, 1)); break;
     case "add-phase": structural(() => {
