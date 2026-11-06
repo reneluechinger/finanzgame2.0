@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinanzGame – Entwurf C</title>
+<style>
+:root{--bg:#0f1220;--card:#181c2e;--card2:#20253b;--ink:#eef0f8;--mute:#8d93ad;--acc:#5ee2b0}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:20px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.logo{font-weight:800;font-size:20px;letter-spacing:.02em}.logo span{color:var(--acc)}
+.week{display:flex;gap:6px}.week i{width:30px;height:30px;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-style:normal;font-size:12px;color:var(--mute)}
+.week i.d{background:#2c3555;color:var(--ink)}.week i.c{background:var(--acc);color:#0f1220;font-weight:800}
+.bal{text-align:right}.bal small{color:var(--mute);font-size:12px}.bal b{display:block;font-size:24px}
+.rings{display:grid;grid-template-columns:repeat(5,1fr) 1.2fr;gap:12px;margin-bottom:18px}
+.ring{background:var(--card);border-radius:18px;padding:14px;text-align:center}
+.ring svg{width:74px;height:74px}.ring b{display:block;font-size:13px;color:var(--mute);margin-top:6px;font-weight:600}
+.sc{background:linear-gradient(135deg,#5ee2b0,#3a8dff);color:#0f1220;border-radius:18px;padding:16px;display:flex;flex-direction:column;justify-content:center}
+.sc small{font-weight:700}.sc b{font-size:42px;line-height:1}.sc span{font-size:12px;font-weight:600;opacity:.8}
+.main{display:grid;grid-template-columns:1fr 2fr;gap:16px}
+.card{background:var(--card);border-radius:18px;padding:18px}
+h2{font-size:13px;color:var(--mute);font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em}
+.tl{border-left:2px solid var(--card2);padding-left:16px}
+.t{position:relative;margin-bottom:18px}.t::before{content:"";position:absolute;left:-23px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--card2)}
+.t.ok::before{background:var(--acc)}.t.now::before{background:#fff;box-shadow:0 0 0 4px #5ee2b055}
+.t small{color:var(--mute);font-size:12px}.t div{font-weight:700}
+.acts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.a{background:var(--card2);border:1px solid #2c3352;border-radius:14px;padding:13px 14px;display:flex;justify-content:space-between;align-items:center;font:inherit;color:inherit;text-align:left}
+.a b{font-size:15px}.a small{display:block;color:var(--mute);font-size:12px;margin-top:3px}
+.d{display:flex;gap:4px}.d i{width:8px;height:22px;border-radius:3px;background:#2c3352}
+.d i.u{background:var(--acc)}.d i.n{background:#ff6b81}
+.btn{margin-top:14px;width:100%;background:var(--acc);color:#0f1220;border:0;border-radius:14px;padding:15px;font-size:16px;font-weight:800}
+</style></head><body>
+<header><div class="logo">Finanz<span>Game</span></div>
+<div class="week"><i class="d">Mo</i><i class="d">Di</i><i class="c">Mi</i><i>Do</i><i>Fr</i><i>Sa</i><i>So</i></div>
+<div class="bal"><small>Kontostand</small><b>Fr. 64.50</b></div></header>
+<div class="rings" id="rings"></div>
+<div class="main">
+<div class="card"><h2>Mittwoch · Woche 1</h2><div class="tl">
+<div class="t ok"><small>Morgen</small><div>Schule</div></div>
+<div class="t ok"><small>Nachmittag</small><div>Nachhilfe geben</div></div>
+<div class="t now"><small>Abend</small><div style="color:var(--acc)">Jetzt wählen</div></div></div></div>
+<div class="card"><h2>Abend: Aktivität wählen</h2><p style="color:var(--mute);font-size:12px;margin:-6px 0 10px">Balken: Geld · Zufriedenheit · Wertstiftung · Energie · Beziehungen (grün = steigt, rot = sinkt)</p><div class="acts" id="acts"></div>
+<button class="btn">Tag beenden</button></div></div>
+<script>
+const V=[["Geld",48,"#5ee2b0"],["Zufriedenheit",62,"#ffd166"],["Wertstiftung",55,"#b388ff"],["Energie",38,"#ff6b81"],["Beziehungen",60,"#4cc9f0"]];
+const r=30,c=2*Math.PI*r;
+document.getElementById("rings").innerHTML=V.map(([n,v,col])=>`<div class="ring"><svg viewBox="0 0 74 74"><circle cx="37" cy="37" r="${r}" fill="none" stroke="#2c3352" stroke-width="8"/><circle cx="37" cy="37" r="${r}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c*v/100} ${c}" transform="rotate(-90 37 37)"/><text x="37" y="43" text-anchor="middle" fill="#eef0f8" font-size="18" font-weight="800">${v}</text></svg><b>${n}</b></div>`).join("")+`<div class="sc"><small>Punkte</small><b>40</b><span>Ø 53 − Ungleichgewicht 12</span></div>`;
+// effekte: Reihenfolge wie V, 1=+ 2=++ -1=−
+const A=[["Freunde treffen","Fr. −15",[-1,1,0,0,2]],["Ausruhen","",[0,1,0,2,0]],["Der Familie helfen","",[0,0,1,-1,2]],["Gamen","",[0,1,0,-1,-1]],["Sport","",[0,1,0,1,1]],["Online-Kurs","wirkt ab Woche 2",[-1,0,1,-1,0]]];
+document.getElementById("acts").innerHTML=A.map(([n,s,e])=>`<button class="a"><span><b>${n}</b><small>${s||"&nbsp;"}</small></span><span class="d">${e.map(x=>`<i class="${x>0?"u":x<0?"n":""}" style="opacity:${x?Math.abs(x)/2+.25:1}"></i>`).join("")}</span></button>`).join("");
+</script></body></html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinanzGame – Entwurf B</title>
+<style>
+:root{--bg:#fff4dc;--ink:#2b1e3f;--line:#2b1e3f}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Trebuchet MS",system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:18px;
+background-image:radial-gradient(#f5d99a 1.5px,transparent 1.5px);background-size:22px 22px}
+.box{background:#fff;border:3px solid var(--line);border-radius:20px;box-shadow:5px 5px 0 var(--line)}
+header{display:flex;align-items:center;gap:14px;padding:12px 18px;margin-bottom:16px}
+.logo{font-size:26px;font-weight:900;flex:1}.logo span{background:#ffcd3c;padding:0 8px;border-radius:8px}
+.pill{border:3px solid var(--line);border-radius:30px;padding:6px 14px;font-weight:800;background:#c8f0ff}
+.pill.g{background:#b9f3c6}
+.vals{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.v{padding:12px 10px;text-align:center}.v .e{font-size:30px}.v b{display:block;font-size:14px;margin:4px 0 6px}
+.meter{height:14px;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#eee}.meter i{display:block;height:100%}
+.v .n{font-weight:900;font-size:20px;margin-top:4px}
+.row{display:grid;grid-template-columns:240px 1fr;gap:16px}
+.day{padding:16px}.day h3{font-size:18px;margin-bottom:12px}
+.s{border:3px dashed #bbb;border-radius:14px;padding:10px 12px;margin-bottom:10px;font-weight:800}
+.s small{display:block;font-size:12px;opacity:.6;font-weight:700}
+.s.fix{border-style:solid;border-color:#bbb;background:#f1f1f1}.s.on{border:3px solid var(--line);background:#ffe58a}
+.s.now{border-color:#ff6b6b;color:#ff6b6b}
+.acts{padding:16px}.acts h3{font-size:20px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.a{border:3px solid var(--line);border-radius:16px;padding:12px;font:inherit;color:inherit;text-align:left;box-shadow:3px 3px 0 var(--line)}
+.a .e{font-size:28px}.a b{display:block;font-size:16px;margin:4px 0}
+.a small{font-weight:700;font-size:13px}
+.go{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.score{font-weight:900;font-size:18px}.score span{font-size:28px;background:#ffcd3c;border:3px solid var(--line);border-radius:12px;padding:0 10px}
+.btn{background:#ff6b6b;color:#fff;border:3px solid var(--line);border-radius:16px;padding:12px 26px;font:inherit;font-size:18px;font-weight:900;box-shadow:4px 4px 0 var(--line)}
+</style></head><body>
+<header class="box"><div class="logo">Finanz<span>Game</span></div><div class="pill">📅 Woche 1 · Mittwoch</div><div class="pill g">💰 Fr. 64.50</div></header>
+<div class="vals">
+<div class="v box"><div class="e">💰</div><b>Geld</b><div class="meter"><i style="width:48%;background:#3ccf6e"></i></div><div class="n">48</div></div>
+<div class="v box"><div class="e">😊</div><b>Zufriedenheit</b><div class="meter"><i style="width:62%;background:#ffcd3c"></i></div><div class="n">62</div></div>
+<div class="v box"><div class="e">🤝</div><b>Wertstiftung</b><div class="meter"><i style="width:55%;background:#a77bff"></i></div><div class="n">55</div></div>
+<div class="v box"><div class="e">⚡</div><b>Energie</b><div class="meter"><i style="width:38%;background:#ff6b6b"></i></div><div class="n">38</div></div>
+<div class="v box"><div class="e">❤️</div><b>Beziehungen</b><div class="meter"><i style="width:60%;background:#4cc9f0"></i></div><div class="n">60</div></div>
+</div>
+<div class="row">
+<div class="day box"><h3>Dein Mittwoch</h3>
+<div class="s fix"><small>Morgen</small>🏫 Schule</div>
+<div class="s on"><small>Nachmittag</small>📚 Nachhilfe geben</div>
+<div class="s now"><small>Abend</small>👉 Was machst du?</div></div>
+<div><div class="acts box"><h3>Wähle deinen Abend</h3><div class="grid">
+<button class="a" style="background:#c8f0ff"><div class="e">🍕</div><b>Freunde treffen</b><small>❤️++ 😊+ 💰−</small></button>
+<button class="a" style="background:#e3d6ff"><div class="e">🛋️</div><b>Ausruhen</b><small>⚡++ 😊+</small></button>
+<button class="a" style="background:#b9f3c6"><div class="e">🍽️</div><b>Familie helfen</b><small>❤️++ 🤝+ ⚡−</small></button>
+<button class="a" style="background:#ffd6d6"><div class="e">🎮</div><b>Gamen</b><small>😊+ ⚡− ❤️−</small></button>
+<button class="a" style="background:#fff0b3"><div class="e">⚽</div><b>Sport</b><small>⚡+ 😊+ ❤️+</small></button>
+<button class="a" style="background:#ffe1c2"><div class="e">💻</div><b>Online-Kurs</b><small>💰− ⚡− ⏳ später Lohn+</small></button>
+</div></div>
+<div class="go"><div class="score">Punkte <span>40</span></div><button class="btn">Tag beenden 🚀</button></div></div>
+</div></body></html>

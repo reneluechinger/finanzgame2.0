@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinanzGame – Entwurf A</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2433;--mute:#6b7385;--line:#e3e6ec;--acc:#2f6fed;
+--geld:#2e9d5b;--zuf:#f2a516;--wert:#8a4fd8;--ene:#e2554f;--bez:#2aa3c4}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:20px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.logo{font-weight:800;font-size:22px}.logo span{color:var(--acc)}
+.day{font-size:15px;color:var(--mute)}.day b{color:var(--ink);font-size:18px}
+.konto{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
+main{display:grid;grid-template-columns:280px 1fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:12px}
+.val{margin-bottom:14px}.val .top{display:flex;justify-content:space-between;font-weight:600;font-size:15px;margin-bottom:5px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;border-radius:5px}
+.score{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.score b{font-size:30px}.score small{color:var(--mute)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.slot{border:2px solid var(--line);border-radius:14px;padding:12px;min-height:78px}
+.slot small{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.slot div{font-weight:700;margin-top:6px}
+.slot.fix{background:#eef0f4}.slot.done{border-color:var(--acc);background:#f0f5ff}.slot.open{border-style:dashed;border-color:var(--acc)}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.act{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:96px;text-align:left;font:inherit;color:inherit}
+.act b{display:block;font-size:15px;margin-bottom:8px}
+.fx{display:flex;flex-wrap:wrap;gap:5px}.fx span{font-size:12px;padding:2px 7px;border-radius:20px;font-weight:600}
+.p{background:#e3f5ea;color:#1d7a43}.m{background:#fde8e7;color:#b8322c}
+footer{display:flex;justify-content:flex-end;margin-top:16px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:14px 26px;font-size:16px;font-weight:700}
+</style></head><body>
+<header><div class="logo">Finanz<span>Game</span></div>
+<div class="day">Woche 1 · <b>Tag 3 – Mittwoch</b></div><div class="konto">Konto: Fr. 64.50</div></header>
+<main>
+<section class="card"><h2>Deine Werte</h2>
+<div class="val"><div class="top"><span>Geld</span><span>48</span></div><div class="bar"><i style="width:48%;background:var(--geld)"></i></div></div>
+<div class="val"><div class="top"><span>Zufriedenheit</span><span>62</span></div><div class="bar"><i style="width:62%;background:var(--zuf)"></i></div></div>
+<div class="val"><div class="top"><span>Wertstiftung</span><span>55</span></div><div class="bar"><i style="width:55%;background:var(--wert)"></i></div></div>
+<div class="val"><div class="top"><span>Energie</span><span>38</span></div><div class="bar"><i style="width:38%;background:var(--ene)"></i></div></div>
+<div class="val"><div class="top"><span>Beziehungen</span><span>60</span></div><div class="bar"><i style="width:60%;background:var(--bez)"></i></div></div>
+<div class="score"><div><small>Punkte</small><br><b>40</b></div><small>Ø 53 − Ungleichgewicht 12</small></div>
+</section>
+<section>
+<div class="slots"><div class="slot fix"><small>Morgen</small><div>Schule</div></div>
+<div class="slot done"><small>Nachmittag</small><div>Nachhilfe geben</div></div>
+<div class="slot open"><small>Abend</small><div style="color:var(--acc)">Aktivität wählen</div></div></div>
+<div class="card"><h2>Was machst du am Abend?</h2>
+<div class="acts">
+<button class="act"><b>Freunde treffen</b><div class="fx"><span class="p">Beziehungen ++</span><span class="p">Zufriedenheit +</span><span class="m">Geld −</span></div></button>
+<button class="act"><b>Ausruhen</b><div class="fx"><span class="p">Energie ++</span><span class="p">Zufriedenheit +</span></div></button>
+<button class="act"><b>Der Familie helfen</b><div class="fx"><span class="p">Beziehungen ++</span><span class="p">Wertstiftung +</span><span class="m">Energie −</span></div></button>
+<button class="act"><b>Gamen</b><div class="fx"><span class="p">Zufriedenheit +</span><span class="m">Energie −</span><span class="m">Beziehungen −</span></div></button>
+<button class="act"><b>Sport</b><div class="fx"><span class="p">Energie +</span><span class="p">Zufriedenheit +</span><span class="p">Beziehungen +</span></div></button>
+<button class="act"><b>Online-Kurs</b><div class="fx"><span class="m">Geld −</span><span class="m">Energie −</span><span class="p">später: Lohn +</span></div></button>
+</div></div>
+<footer><button class="btn">Tag beenden →</button></footer>
+</section></main></body></html>
