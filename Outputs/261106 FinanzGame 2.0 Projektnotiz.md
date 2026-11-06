@@ -19,7 +19,7 @@ Zweite Version von FinanzGame. Lernende wählen ein Startalter (12–16) und spi
 - Lebensphasen: Oberstufe → mit 16 Lehre oder Gymnasium → Gymnasium mit 18 zu Studium (18–22) oder Job → Berufsleben
 - Steuern ab 18, Krankenkasse ab 19, Kreditkarte, Leasing, Ratenkauf, Betreibung, WG oder Wohnung ab 20 (freiwillig)
 - Aktivitäten mit Alter und Job-Stufe, gesperrte Vorschau, Ausruhen immer
-- Seltenheit pro Quartal: selten 5 %, sehr selten 1 %, ultra-selten 0,1 %. «Geld an Israel spenden» ultra-selten, Fr. 10 000 (auch Sparkonto), +20 auf die anderen Werte (Wunsch René). Offen: Neutralität an der Volksschule bewusst entscheiden
+- Seltenheit pro Quartal: selten 5 %, sehr selten 1 %, ultra-selten 0,1 %. Die Spenden-Aktivität an einen Staat wurde wieder entfernt (Entscheid René, 6.11.2026)
 - Energie-Kosten −20 %
 - «Eigene Playlist hören» (+12 Energie) nach «Playlist zusammenstellen»
 - Sehr ausgewogenes Spiel etwa 95 Punkte, Faustregel «Abend ausruhen» 87–90, zufällig rund 30 (Kompromiss zwischen «nahe 100» und «nicht zu leicht»)

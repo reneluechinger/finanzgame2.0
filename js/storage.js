@@ -229,6 +229,7 @@ export function sanitizeConfig(cfg) {
 // -Ereignisse werden durch die neue Abstimmung ersetzt. Eigene Aktivitäten und Ereignisse bleiben.
 const BALANCE_KEYS = ["startMoney", "startMoneyPerYear", "priceLevel", "moneyTargets", "phases", "costs", "drift",
   "softCap", "energyCostFactor", "tax", "ageDrift", "interestPercent", "debtInterestPercent"];
+const REMOVED_ACTIVITIES = ["r_spende_israel"];
 function migrateContent(c) {
   const target = DEFAULT_CONFIG.contentVersion;
   if ((c.contentVersion || 1) >= target) return c;
@@ -239,6 +240,8 @@ function migrateContent(c) {
       c[key] = c[key].map(x => (defs.has(x.id) ? structuredClone(defs.get(x.id)) : x));
     }
   }
+  // Ab Version 3: entfernte Standard-Aktivitäten auch aus gespeicherten Varianten löschen
+  if ((c.contentVersion || 1) < 3) c.activities = c.activities.filter(a => !REMOVED_ACTIVITIES.includes(a.id));
   for (const key of ["activities", "events"]) {
     const have = new Set(c[key].map(x => x.id));
     for (const d of DEFAULT_CONFIG[key]) {

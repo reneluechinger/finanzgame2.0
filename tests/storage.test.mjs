@@ -28,6 +28,13 @@ test("Gespeicherte Variante von vor der Geld-Progression bekommt die neuen Werte
   assert.deepEqual(S.validateConfig(c), []);
 });
 
+test("Gespeicherte Varianten verlieren die entfernte Spenden-Aktivität", () => {
+  const old = structuredClone(DEFAULT_CONFIG);
+  old.contentVersion = 2;
+  old.activities.push({ id: "r_spende_israel", name: "x", icon: "x", when: ["abend"], money: -10000, rarity: "ultra", effects: {} });
+  assert.ok(!S.sanitizeConfig(old).activities.some(a => a.id === "r_spende_israel"));
+});
+
 test("Aktuelle Variante bleibt unverändert", () => {
   const cur = structuredClone(DEFAULT_CONFIG);
   cur.startMoney = 999;

@@ -76,10 +76,7 @@ export const ADULT_ACTIVITIES = [
   { id: "r_praktikum", name: "Praktikum bei der Traumfirma", icon: "🚀", when: ["nachmittag", "wochenende"], money: 1200, minAge: 17, rarity: "sehr selten",
     effects: { zufriedenheit: 10, wertstiftung: 8, energie: -6, beziehungen: 4 }, info: "So eine Chance kommt selten" },
   { id: "r_kunstwerk", name: "Eigenes Bild an einer Ausstellung verkaufen", icon: "🖼️", when: ["wochenende"], money: 800, rarity: "sehr selten",
-    effects: { zufriedenheit: 12, wertstiftung: 5, beziehungen: 3 } },
-  { id: "r_spende_israel", name: "Geld an Israel spenden", icon: "🕊️", when: ALL, money: -10000, rarity: "ultra", useSavings: true,
-    effects: { zufriedenheit: 20, wertstiftung: 20, energie: 20, beziehungen: 20 },
-    info: "Kostet Fr. 10 000, auch vom Sparkonto. Alle anderen Werte +20." }
+    effects: { zufriedenheit: 12, wertstiftung: 5, beziehungen: 3 } }
 ];
 
 export const ADULT_EVENTS = [

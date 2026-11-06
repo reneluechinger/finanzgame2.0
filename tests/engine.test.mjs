@@ -155,28 +155,22 @@ test("Playlist zusammenstellen schaltet «Eigene Playlist hören» frei (+12 Ene
 });
 
 test("Seltene Aktivitäten erscheinen etwa so oft wie eingestellt", () => {
-  const israel = cfg.activities.find(a => a.id === "r_spende_israel");
+  const ultraAct = { id: "r_test_ultra", rarity: "ultra", when: E.SLOTS };
   const konzert = cfg.activities.find(a => a.id === "r_konzertticket");
   let ultra = 0, selten = 0;
   const N = 200000;
   for (let i = 0; i < N; i++) {
     const st = { started: "s" + i, day: 1 };
-    if (E.SLOTS.some(sl => E.rareAppears(st, israel, sl))) ultra++;
+    if (E.SLOTS.some(sl => E.rareAppears(st, ultraAct, sl))) ultra++;
     if (E.SLOTS.some(sl => E.rareAppears(st, konzert, sl))) selten++;
-    assert.ok(E.SLOTS.filter(sl => E.rareAppears(st, israel, sl)).length <= 1);
+    assert.ok(E.SLOTS.filter(sl => E.rareAppears(st, ultraAct, sl)).length <= 1);
   }
   assert.ok(ultra / N > 0.0005 && ultra / N < 0.002, "ultra " + ultra / N);
   assert.ok(selten / N > 0.04 && selten / N < 0.06, "selten " + selten / N);
 });
 
-test("Spende an Israel: braucht Fr. 10 000 inkl. Sparkonto, gibt +20 auf die anderen Werte", () => {
-  const st = E.newGame(cfg, "t", "x", 12);
-  const act = cfg.activities.find(a => a.id === "r_spende_israel");
-  st.konto = 1000; st.spar = 8000;
-  assert.equal(E.activityStatus(cfg, st, act, "abend").ok, false);
-  st.spar = 9000;
-  assert.equal(E.activityStatus(cfg, st, act, "abend").ok, true);
-  for (const id of ["zufriedenheit", "wertstiftung", "energie", "beziehungen"]) assert.equal(act.effects[id], 20);
+test("Die Spenden-Aktivität ist entfernt", () => {
+  assert.ok(!cfg.activities.some(a => a.id === "r_spende_israel"));
 });
 
 test("Ereignisse nach Alter: Schulereignisse nicht mehr mit 22", () => {
